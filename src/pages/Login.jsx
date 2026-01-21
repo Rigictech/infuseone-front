@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Card, Form, Button, Row, Col } from 'react-bootstrap';
-import '../styles/Login.css';
+import { Container, Card, Form, Button, Row, Col, Alert, Spinner } from 'react-bootstrap';
+import userService from '../services/userService';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [apiError, setApiError] = useState('');
     const navigate = useNavigate();
 
     const validate = () => {
@@ -17,16 +19,33 @@ const Login = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validate();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
         } else {
-            // Fake auth success
-            console.log('Login successful', { email, password });
-            // In a real app, we'd set an auth token here
-            navigate('/');
+            try {
+                setLoading(true);
+                setApiError('');
+
+                const response = await userService.login({ email, password, "device_name": "web" });
+
+                // Assuming response.data.token or similar structure
+                const { token, role } = response.data; // Adjust based on actual API response
+                if (token) {
+                    localStorage.setItem('authToken', token);
+                    if (role) localStorage.setItem('role', role);
+                    navigate('/');
+                } else {
+                    setApiError('Login failed: No token received');
+                }
+            } catch (err) {
+                console.error(err);
+                setApiError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+            } finally {
+                setLoading(false);
+            }
         }
     };
 
@@ -35,9 +54,16 @@ const Login = () => {
             <Card className="shadow-sm border-0" style={{ maxWidth: '400px', width: '100%' }}>
                 <Card.Body className="p-4 p-sm-5">
                     <div className="text-center mb-4">
-                        <h2 className="fw-bold text-dark">Welcome Back</h2>
-                        <p className="text-muted">Login to your admin dashboard</p>
+                        <img
+                            src="/favicon.png"
+                            alt="Infuse One Logo"
+                            height={100}
+                            width="auto"
+                            className="mb-3"
+                        />
                     </div>
+
+                    {apiError && <Alert variant="danger">{apiError}</Alert>}
 
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3" controlId="email">
@@ -79,19 +105,11 @@ const Login = () => {
                             type="submit"
                             className="w-100 mb-3 fw-semibold"
                             style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                            disabled={loading}
                         >
-                            Login
+                            {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Login'}
                         </Button>
                     </Form>
-
-                    <div className="text-center">
-                        <p className="small text-muted mb-0">
-                            Don't have an account?{' '}
-                            <Link to="/signup" className="text-decoration-none fw-semibold" style={{ color: '#003366' }}>
-                                Sign up
-                            </Link>
-                        </p>
-                    </div>
                 </Card.Body>
             </Card>
         </Container>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Users, User, LogOut } from 'lucide-react';
+import { Users, User, LogOut, FormIcon, Link, Info, FileText } from 'lucide-react';
 import { Nav, Button, Image } from 'react-bootstrap';
 import '../styles/Sidebar.css';
 
@@ -9,6 +9,10 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
 
     const navItems = [
         { path: '/users-list', label: 'User Management', icon: Users },
+        { path: '/formstack-list', label: 'Formstack URLs', icon: FormIcon },
+        { path: '/website-list', label: 'Website URLs', icon: Link },
+        { path: '/info', label: 'Important Info', icon: Info },
+        { path: '/uploads', label: 'Uploads', icon: FileText },
         { path: '/profile', label: 'Profile', icon: User },
     ];
 

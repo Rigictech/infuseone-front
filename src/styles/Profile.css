@@ -1,0 +1,62 @@
+/* Profile.css */
+.profile-header-bg {
+    height: 100px;
+    background-color: #003366;
+}
+
+.avatar-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-top: -50px;
+}
+
+.avatar-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 4px solid #fff;
+    background-color: #e0e7ff;
+    color: #003366;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.avatar-edit-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #dc3545;
+    /* Red color as per screenshot arrow, or maybe theme blue? Screenshot shows a red arrow pointing to it, icon itself usually gray/blue. Let's make it theme blue or dark text. */
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-edit-btn:hover {
+    background-color: #f8f9fa;
+    color: #003366;
+    transform: scale(1.1);
+}
+
+.password-toggle-btn {
+    border-left: 0;
+    background-color: transparent;
+}
+
+.password-toggle-btn:hover,
+.password-toggle-btn:focus {
+    background-color: transparent;
+    box-shadow: none;
+    border-color: #dee2e6;
+    /* Match default input border */
+}
