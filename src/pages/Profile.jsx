@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -15,74 +16,85 @@ const Profile = () => {
     };
 
     return (
-        <div className="profile-card">
-            <div className="profile-header-bg"></div>
-            <div className="profile-content">
-                <div className="profile-avatar-large">
-                    {profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
-                </div>
+        <Container fluid className="py-4">
+            <h2 className="text-primary fw-bold mb-4">User Profile</h2>
+            <Row className="justify-content-center">
+                <Col md={10} lg={8} xl={6}>
+                    <Card className="border-0 shadow-sm overflow-hidden">
+                        <div style={{ height: '100px', backgroundColor: '#003366' }}></div>
+                        <Card.Body className="pt-0 relative">
+                            <div className="d-flex flex-column align-items-center" style={{ marginTop: '-50px' }}>
+                                <div
+                                    className="rounded-circle d-flex align-items-center justify-content-center border border-4 border-white shadow-sm"
+                                    style={{ width: '100px', height: '100px', backgroundColor: '#e0e7ff', color: '#003366', fontSize: '32px', fontWeight: 'bold' }}
+                                >
+                                    {profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                </div>
+                                <h3 className="mt-3 fw-bold">{profile.name}</h3>
+                                <p className="text-muted">{profile.role}</p>
+                            </div>
 
-                <div className="profile-info">
-                    <h2 className="profile-name">{profile.name}</h2>
-                    <p className="profile-role">{profile.role}</p>
-                </div>
+                            <hr className="my-4" />
 
-                <hr style={{ borderColor: 'var(--border-color)', margin: '0 0 20px 0' }} />
+                            <Form>
+                                <Form.Group className="mb-3" controlId="name">
+                                    <Form.Label className="fw-medium">Full Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="name"
+                                        value={profile.name}
+                                        onChange={handleChange}
+                                    />
+                                </Form.Group>
 
-                <form className="profile-form">
-                    <div className="form-group">
-                        <label className="form-label">Full Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            className="form-input"
-                            value={profile.name}
-                            onChange={handleChange}
-                        />
-                    </div>
+                                <Form.Group className="mb-3" controlId="email">
+                                    <Form.Label className="fw-medium">Email Address</Form.Label>
+                                    <Form.Control
+                                        type="email"
+                                        name="email"
+                                        value={profile.email}
+                                        onChange={handleChange}
+                                    />
+                                </Form.Group>
 
-                    <div className="form-group">
-                        <label className="form-label">Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            className="form-input"
-                            value={profile.email}
-                            onChange={handleChange}
-                        />
-                    </div>
+                                <Form.Group className="mb-3" controlId="role">
+                                    <Form.Label className="fw-medium">Role</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="role"
+                                        value={profile.role}
+                                        readOnly
+                                        disabled
+                                        className="bg-light"
+                                    />
+                                </Form.Group>
 
-                    <div className="form-group">
-                        <label className="form-label">Role</label>
-                        <input
-                            type="text"
-                            name="role"
-                            className="form-input"
-                            value={profile.role}
-                            readOnly
-                            disabled
-                            style={{ backgroundColor: '#f1f5f9' }}
-                        />
-                    </div>
+                                <Form.Group className="mb-4" controlId="bio">
+                                    <Form.Label className="fw-medium">Bio</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        name="bio"
+                                        value={profile.bio}
+                                        onChange={handleChange}
+                                    />
+                                </Form.Group>
 
-                    <div className="form-group">
-                        <label className="form-label">Bio</label>
-                        <textarea
-                            name="bio"
-                            className="form-input"
-                            rows="3"
-                            value={profile.bio}
-                            onChange={handleChange}
-                        ></textarea>
-                    </div>
-                </form>
-
-                <div className="profile-actions">
-                    <button className="btn btn-outline">Cancel</button>
-                    <button className="btn btn-primary">Save Changes</button>
-                </div>
-            </div>
-        </div>
+                                <div className="d-flex justify-content-end gap-2">
+                                    <Button variant="outline-secondary">Cancel</Button>
+                                    <Button
+                                        variant="primary"
+                                        style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                                    >
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     );
 };
 

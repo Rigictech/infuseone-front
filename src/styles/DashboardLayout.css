@@ -1,42 +1,25 @@
 /* DashboardLayout.css */
 .dashboard-layout {
-    display: flex;
     min-height: 100vh;
+    background-color: #f8f9fa;
 }
 
 .main-content {
-    flex: 1;
     margin-left: 260px;
-    /* Default Sidebar Width */
+    /* Width of the sidebar */
     transition: margin-left 0.3s ease-in-out;
-    background-color: #f7f9fc;
-    /* Light background for content area */
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    width: calc(100% - 260px);
 }
 
 .dashboard-layout.collapsed .main-content {
     margin-left: 80px;
-    /* Collapsed Sidebar Width */
-}
-
-.container {
-    padding: 2rem;
-    flex: 1;
+    /* Width of collapsed sidebar */
+    width: calc(100% - 80px);
 }
 
 @media (max-width: 768px) {
     .main-content {
         margin-left: 0;
-        /* No margin on mobile */
-    }
-
-    .dashboard-layout.collapsed .main-content {
-        margin-left: 0;
-    }
-
-    .container {
-        padding: 1rem;
+        width: 100%;
     }
 }

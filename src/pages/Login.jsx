@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Container, Card, Form, Button, Row, Col } from 'react-bootstrap';
 import '../styles/Login.css';
 
 const Login = () => {
@@ -30,59 +31,70 @@ const Login = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <div className="auth-header">
-                    <h2 className="auth-title">Welcome Back</h2>
-                    <p className="auth-subtitle">Login to your admin dashboard</p>
-                </div>
-
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label className="form-label" htmlFor="email">Email Address</label>
-                        <input
-                            type="email"
-                            id="email"
-                            className="form-input"
-                            value={email}
-                            onChange={(e) => {
-                                setEmail(e.target.value);
-                                if (errors.email) setErrors({ ...errors, email: null });
-                            }}
-                            placeholder="admin@example.com"
-                        />
-                        {errors.email && <span style={{ color: 'var(--danger-color)', fontSize: '0.8rem' }}>{errors.email}</span>}
+        <Container fluid className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+            <Card className="shadow-sm border-0" style={{ maxWidth: '400px', width: '100%' }}>
+                <Card.Body className="p-4 p-sm-5">
+                    <div className="text-center mb-4">
+                        <h2 className="fw-bold text-dark">Welcome Back</h2>
+                        <p className="text-muted">Login to your admin dashboard</p>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label" htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            className="form-input"
-                            value={password}
-                            onChange={(e) => {
-                                setPassword(e.target.value);
-                                if (errors.password) setErrors({ ...errors, password: null });
-                            }}
-                            placeholder="••••••••"
-                        />
-                        {errors.password && <span style={{ color: 'var(--danger-color)', fontSize: '0.8rem' }}>{errors.password}</span>}
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3" controlId="email">
+                            <Form.Label>Email Address</Form.Label>
+                            <Form.Control
+                                type="email"
+                                value={email}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    if (errors.email) setErrors({ ...errors, email: null });
+                                }}
+                                placeholder="admin@example.com"
+                                isInvalid={!!errors.email}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.email}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Form.Group className="mb-4" controlId="password">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                                type="password"
+                                value={password}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    if (errors.password) setErrors({ ...errors, password: null });
+                                }}
+                                placeholder="••••••••"
+                                isInvalid={!!errors.password}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.password}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            className="w-100 mb-3 fw-semibold"
+                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                        >
+                            Login
+                        </Button>
+                    </Form>
+
+                    <div className="text-center">
+                        <p className="small text-muted mb-0">
+                            Don't have an account?{' '}
+                            <Link to="/signup" className="text-decoration-none fw-semibold" style={{ color: '#003366' }}>
+                                Sign up
+                            </Link>
+                        </p>
                     </div>
-
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-                        Login
-                    </button>
-                </form>
-
-                <div className="text-center mt-4">
-                    <p className="text-sm text-muted">
-                        Don't have an account?{' '}
-                        <Link to="/signup" className="auth-link">Sign up</Link>
-                    </p>
-                </div>
-            </div>
-        </div>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 };
 

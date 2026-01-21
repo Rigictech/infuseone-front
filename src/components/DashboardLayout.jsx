@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import { Container } from 'react-bootstrap';
 import '../styles/DashboardLayout.css';
 
 const DashboardLayout = () => {
-    const [isSidebarOpen, setSidebarOpen] = useState(false); // Mobile toggle
-    const [isCollapsed, setIsCollapsed] = useState(false);   // Desktop collapse
+    const [isSidebarOpen, setSidebarOpen] = useState(false); 
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const toggleSidebar = () => {
         if (window.innerWidth > 768) {
@@ -24,12 +25,12 @@ const DashboardLayout = () => {
                 onClose={() => setSidebarOpen(false)}
             />
 
-            <div className="main-content">
+            <div className="main-content d-flex flex-column min-vh-100">
                 <Topbar onMenuClick={toggleSidebar} isCollapsed={isCollapsed} />
 
-                <div className="container" style={{ paddingTop: '2rem' }}>
+                <Container fluid className="pt-4 flex-grow-1">
                     <Outlet />
-                </div>
+                </Container>
             </div>
         </div>
     );

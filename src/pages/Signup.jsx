@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Container, Card, Form, Button } from 'react-bootstrap';
 import '../styles/Signup.css';
 
 const Signup = () => {
@@ -41,79 +42,96 @@ const Signup = () => {
     };
 
     return (
-        <div className="signup-container">
-            <div className="signup-card">
-                <div className="signup-header">
-                    <h2 className="signup-title">Create Account</h2>
-                    <p className="signup-subtitle">Join us to manage your dashboard</p>
-                </div>
-
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label className="form-label">Full Name</label>
-                        <input
-                            type="text"
-                            name="fullName"
-                            className="form-input"
-                            value={formData.fullName}
-                            onChange={handleChange}
-                            placeholder="John Doe"
-                        />
-                        {errors.fullName && <span style={{ color: 'var(--danger-color)', fontSize: '0.8rem' }}>{errors.fullName}</span>}
+        <Container fluid className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+            <Card className="shadow-sm border-0" style={{ maxWidth: '500px', width: '100%' }}>
+                <Card.Body className="p-4 p-sm-5">
+                    <div className="text-center mb-4">
+                        <h2 className="fw-bold text-dark">Create Account</h2>
+                        <p className="text-muted">Join us to manage your dashboard</p>
                     </div>
 
-                    <div className="form-group">
-                        <label className="form-label">Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            className="form-input"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="john@example.com"
-                        />
-                        {errors.email && <span style={{ color: 'var(--danger-color)', fontSize: '0.8rem' }}>{errors.email}</span>}
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group className="mb-3" controlId="fullName">
+                            <Form.Label>Full Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="fullName"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                placeholder="John Doe"
+                                isInvalid={!!errors.fullName}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.fullName}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" controlId="email">
+                            <Form.Label>Email Address</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="john@example.com"
+                                isInvalid={!!errors.email}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.email}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Form.Group className="mb-3" controlId="password">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                isInvalid={!!errors.password}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.password}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Form.Group className="mb-4" controlId="confirmPassword">
+                            <Form.Label>Confirm Password</Form.Label>
+                            <Form.Control
+                                type="password"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                isInvalid={!!errors.confirmPassword}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.confirmPassword}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            className="w-100 mb-3 fw-semibold"
+                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                        >
+                            Create Account
+                        </Button>
+                    </Form>
+
+                    <div className="text-center">
+                        <p className="small text-muted mb-0">
+                            Already have an account?{' '}
+                            <Link to="/login" className="text-decoration-none fw-semibold" style={{ color: '#003366' }}>
+                                Login
+                            </Link>
+                        </p>
                     </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            className="form-input"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="••••••••"
-                        />
-                        {errors.password && <span style={{ color: 'var(--danger-color)', fontSize: '0.8rem' }}>{errors.password}</span>}
-                    </div>
-
-                    <div className="form-group">
-                        <label className="form-label">Confirm Password</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            className="form-input"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            placeholder="••••••••"
-                        />
-                        {errors.confirmPassword && <span style={{ color: 'var(--danger-color)', fontSize: '0.8rem' }}>{errors.confirmPassword}</span>}
-                    </div>
-
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
-                        Create Account
-                    </button>
-                </form>
-
-                <div className="text-center mt-4">
-                    <p className="text-sm text-muted">
-                        Already have an account?{' '}
-                        <Link to="/login" className="signup-link">Login</Link>
-                    </p>
-                </div>
-            </div>
-        </div>
+                </Card.Body>
+            </Card>
+        </Container>
     );
 };
 
