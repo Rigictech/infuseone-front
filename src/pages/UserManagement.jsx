@@ -73,8 +73,6 @@ const UserManagement = () => {
             const formData = new FormData();
             formData.append('name', userData.name);
             formData.append('email', userData.email);
-            // formData.append('phone', userData.phone); // Add phone if needed by API
-            // formData.append('role', 'user'); // Add role if needed
 
             if (userData.password) {
                 formData.append('password', userData.password);
