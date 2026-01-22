@@ -12,11 +12,18 @@ import Profile from './pages/Profile';
 
 import { UserProvider } from './context/UserContext';
 
+const GhostRedirect = () => {
+  const token = localStorage.getItem('token');
+  return <Navigate to={token ? "/users-list" : "/login"} replace />;
+};
+
 function App() {
   return (
     <UserProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/infuseone-ghost-page" element={<GhostRedirect />} />
+
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
 
@@ -32,9 +39,6 @@ function App() {
               <Route path="profile" element={<Profile />} />
             </Route>
           </Route>
-
-          {/* Redirect root to login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Catch all - 404 */}
           <Route path="*" element={<Navigate to="/login" replace />} />

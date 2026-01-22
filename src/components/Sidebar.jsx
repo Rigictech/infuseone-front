@@ -1,11 +1,13 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Users, User, LogOut, FormIcon, Link, Info, FileText } from 'lucide-react';
-import { Nav, Button, Image } from 'react-bootstrap';
+import { Nav, Image } from 'react-bootstrap';
 import '../styles/Sidebar.css';
+import userService from '../services/userService';
 
 const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
     const location = useLocation();
+    const navigate = useNavigate();
 
     const navItems = [
         { path: '/users-list', label: 'User Management', icon: Users },
@@ -15,6 +17,18 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
         { path: '/uploads', label: 'Uploads', icon: FileText },
         { path: '/profile', label: 'Profile', icon: User },
     ];
+
+    const handleLogout = async () => {
+        try {
+            await userService.logout();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('role');
+            localStorage.removeItem('user');
+            navigate('/login');
+        } catch (error) {
+            console.error("Logout API error:", error);
+        };
+    }
 
     return (
         <>
@@ -50,6 +64,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
                     <Nav.Link
                         as="button"
                         className="logout-btn d-flex align-items-center w-100 border-0 bg-transparent"
+                        onClick={handleLogout}
                     >
                         <LogOut className="nav-icon" size={20} />
                         <span className={`nav-label ${isCollapsed ? 'hidden' : ''}`}>Logout</span>

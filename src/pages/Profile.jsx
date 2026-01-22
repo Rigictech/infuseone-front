@@ -1,20 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, InputGroup, Image, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, InputGroup, Image, Alert, Spinner } from 'react-bootstrap';
 import { Eye, EyeOff, PenLine } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import userService from '../services/userService';
 import '../styles/Profile.css';
 
 const Profile = () => {
-    const { userProfile, updateProfileImage, updateProfileData } = useUser();
+    const { userProfile, updateUserAfterSuccess, refreshUser, getAvatarSrc } = useUser();
 
-    // Separate states for separate forms
+    const [name, setName] = useState(userProfile.name);
     const [email, setEmail] = useState(userProfile.email);
+    const [profile, setProfile] = useState();
     const [passwords, setPasswords] = useState({
         currentPassword: '',
         newPassword: ''
     });
 
     // UI State
+    const [loading, setLoading] = useState(false);
+    const [loadingProfile, setLoadingProfile] = useState(false);
+    const [loadingPassword, setLoadingPassword] = useState(false);
     const [showPassword, setShowPassword] = useState({
         current: false,
         new: false
@@ -23,44 +28,90 @@ const Profile = () => {
         type: '', // 'success' or 'error'
         message: ''
     });
-
+    const imageUrl = import.meta.env.VITE_LARAVEL_IMAGE_URL;
     const fileInputRef = useRef(null);
 
     // Sync local email state if context changes externally
     useEffect(() => {
         setEmail(userProfile.email);
-    }, [userProfile.email]);
+        setName(userProfile.name);
+    }, [userProfile.email, userProfile.name]);
 
     // Avatar Handling
     const handleAvatarClick = () => fileInputRef.current.click();
+    const avatarSrc = getAvatarSrc(imageUrl);
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
+
         const file = e.target.files[0];
-        if (file) {
-            if (file.size > 2 * 1024 * 1024) {
-                setStatus({ type: 'error', message: 'Image size must be less than 2MB.' });
-                return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                updateProfileImage(reader.result); // Update Context mainly
-                setStatus({ type: 'success', message: 'Profile picture updated!' });
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            setStatus({ type: 'error', message: 'Image size must be less than 2MB.' });
+            return;
         }
+
+        const reader = new FileReader();
+
+        reader.onloadend = async () => {
+            const base64Image = reader.result;
+
+            setLoading(true);
+            try {
+                const payload = {
+                    profile_image: base64Image
+                };
+
+                await userService.updateProfileImage(payload);
+
+                // Update global state ONCE (bump version) + re-fetch latest server image path
+                updateUserAfterSuccess({});
+                await refreshUser();
+
+                setStatus({ type: 'success', message: 'Profile picture updated!' });
+
+            } catch (error) {
+                setStatus({
+                    type: 'error',
+                    message: error.response?.data?.message || 'Failed to update profile picture.'
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        reader.readAsDataURL(file);
     };
 
     // Email Update
-    const handleEmailUpdate = (e) => {
+    const handleEmailUpdate = async (e) => {
         e.preventDefault();
-        // Simulate API call
-        console.log('Updating Email:', email);
-        updateProfileData({ email });
-        setStatus({ type: 'success', message: 'Email updated successfully!' });
+        setLoadingProfile(true);
+        setStatus({ type: '', message: '' });
+
+        try {
+            await userService.updateProfile({ name, email });
+
+            // Update global ONCE
+            updateUserAfterSuccess({ name, email });
+
+            // Re-fetch to ensure UI is in sync with backend (and triggers re-render everywhere)
+            await refreshUser();
+
+            setStatus({ type: 'success', message: 'Profile updated successfully!' });
+
+        } catch (error) {
+            setStatus({
+                type: 'error',
+                message: error.response?.data?.message || 'Failed to update profile.'
+            });
+        } finally {
+            setLoadingProfile(false);
+        }
     };
 
     // Password Update
-    const handlePasswordUpdate = (e) => {
+    const handlePasswordUpdate = async (e) => {
         e.preventDefault();
         if (!passwords.currentPassword || !passwords.newPassword) {
             setStatus({ type: 'error', message: 'Please fill in all password fields.' });
@@ -70,10 +121,26 @@ const Profile = () => {
             setStatus({ type: 'error', message: 'New password must be at least 6 characters.' });
             return;
         }
-        // Simulate API call
-        console.log('Updating Password:', passwords);
-        setStatus({ type: 'success', message: 'Password updated successfully!' });
-        setPasswords({ currentPassword: '', newPassword: '' });
+
+        setLoadingPassword(true);
+        setStatus({ type: '', message: '' });
+
+        try {
+            await userService.changePassword({
+                current_password: passwords.currentPassword,
+                new_password: passwords.newPassword,
+                new_password_confirmation: passwords.newPassword // Often required
+            });
+            setStatus({ type: 'success', message: 'Password updated successfully!' });
+            setPasswords({ currentPassword: '', newPassword: '' });
+        } catch (error) {
+            setStatus({
+                type: 'error',
+                message: error.response?.data?.message || 'Failed to update password.'
+            });
+        } finally {
+            setLoadingPassword(false);
+        }
     };
 
     const togglePasswordVisibility = (field) => {
@@ -96,38 +163,38 @@ const Profile = () => {
                             {/* Avatar Section */}
                             <div className="d-flex flex-column align-items-center mb-3" style={{ marginTop: '-50px' }}>
                                 <div
-                                  className="avatar-wrapper position-relative rounded-circle border border-4 border-white shadow-sm d-flex align-items-center justify-content-center"
-                                  style={{ width: 100, height: 100, backgroundColor: '#d2d5e0' }}
-                                  onClick={handleAvatarClick}
-                                  role="button"                             
->
-                                  {userProfile.avatar ? (
-                                    <Image
-                                      src={userProfile.avatar}
-                                      roundedCircle
-                                      className="w-100 h-100 object-fit-cover"
-                                    />
-                                  ) : (
-                                    <span
-                                      className="fw-bold"
-                                      style={{ fontSize: 32, color: '#003366' }}
-                                    >
-                                      {userProfile.name
-                                        .split(' ')
-                                        .map(n => n[0])
-                                        .join('')
-                                        .substring(0, 2)
-                                        .toUpperCase()}
-                                    </span>
-                                  )}
+                                    className="avatar-wrapper position-relative rounded-circle border border-4 border-white shadow-sm d-flex align-items-center justify-content-center"
+                                    style={{ width: 100, height: 100, backgroundColor: '#d2d5e0' }}
+                                    onClick={handleAvatarClick}
+                                    role="button"
+                                >
+                                    {avatarSrc ? (
+                                        <Image
+                                            src={avatarSrc}
+                                            roundedCircle
+                                            className="w-100 h-100 object-fit-cover"
+                                        />
+                                    ) : (
+                                        <span
+                                            className="fw-bold"
+                                            style={{ fontSize: 32, color: '#003366' }}
+                                        >
+                                            {userProfile.name
+                                                .split(' ')
+                                                .map(n => n[0])
+                                                .join('')
+                                                .substring(0, 2)
+                                                .toUpperCase()}
+                                        </span>
+                                    )}
 
-                                  {/* Camera icon */}
-                                  <div
-                                    className="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
-                                    style={{ width: 28, height: 28, transform: 'translate(25%, 25%)' }}
-                                  >
-                                    <PenLine size={16} />
-                                  </div>
+                                    {/* Camera icon */}
+                                    <div
+                                        className="position-absolute bottom-0 end-0 bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                        style={{ width: 28, height: 28, transform: 'translate(25%, 25%)' }}
+                                    >
+                                        <PenLine size={16} />
+                                    </div>
                                     <input
                                         type="file"
                                         ref={fileInputRef}
@@ -145,13 +212,24 @@ const Profile = () => {
                     {/* Email Update Form */}
                     <Card className="border-0 shadow-sm mb-4">
                         <Card.Body>
-                            <h6 className="fw-bold mb-3 text-primary">Update Email</h6>
+                            <h6 className="fw-bold mb-3 text-primary">Update Profile</h6>
                             <Form onSubmit={handleEmailUpdate}>
+                                <Form.Group className="mb-3" controlId="name">
+                                    <Form.Label className="fw-medium small">Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={name}
+                                        placeholder="Enter your name"
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
                                 <Form.Group className="mb-3" controlId="email">
-                                    <Form.Label className="fw-medium small">Email Address</Form.Label>
+                                    <Form.Label className="fw-medium small">Email</Form.Label>
                                     <Form.Control
                                         type="email"
                                         value={email}
+                                        placeholder="Enter your email"
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
                                     />
@@ -161,8 +239,9 @@ const Profile = () => {
                                         type="submit"
                                         size="sm"
                                         style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                                        disabled={loadingProfile}
                                     >
-                                        Update Email
+                                        {loadingProfile ? <Spinner animation="border" size="sm" /> : 'Update Profile'}
                                     </Button>
                                 </div>
                             </Form>
@@ -180,6 +259,7 @@ const Profile = () => {
                                         <Form.Control
                                             type={showPassword.current ? "text" : "password"}
                                             value={passwords.currentPassword}
+                                            placeholder="Enter your current password"
                                             onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
                                             required
                                         />
@@ -199,6 +279,7 @@ const Profile = () => {
                                         <Form.Control
                                             type={showPassword.new ? "text" : "password"}
                                             value={passwords.newPassword}
+                                            placeholder="Enter your new password"
                                             onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                                             required
                                         />
@@ -216,8 +297,9 @@ const Profile = () => {
                                         type="submit"
                                         size="sm"
                                         style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                                        disabled={loadingPassword}
                                     >
-                                        Update Password
+                                        {loadingPassword ? <Spinner animation="border" size="sm" /> : 'Update Password'}
                                     </Button>
                                 </div>
                             </Form>

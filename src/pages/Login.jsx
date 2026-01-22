@@ -20,7 +20,6 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
-        debugger
         e.preventDefault();
         const validationErrors = validate();
         if (Object.keys(validationErrors).length > 0) {
