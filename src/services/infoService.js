@@ -1,41 +1,47 @@
-// Mock data for Info Paragraphs
-const MOCK_INFO = [
-    { id: 1, text: 'Welcome to the Infuse One Admin Panel. Here you can manage users, update form URLs, and configure system settings.' },
-    { id: 2, text: 'Please ensure all user data is handled in compliance with HIPAA regulations. Do not share credentials.' },
-];
+import axios from "axios";
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_LARAVEL_URL,
+});
 
-export const infoService = {
-    getAll: async () => {
-        await delay(600);
-        return [...MOCK_INFO];
-    },
-
-    create: async (text) => {
-        await delay(600);
-        const newInfo = { id: Date.now(), text };
-        MOCK_INFO.push(newInfo);
-        return newInfo;
-    },
-
-    update: async (id, text) => {
-        await delay(600);
-        const index = MOCK_INFO.findIndex(i => i.id === id);
-        if (index !== -1) {
-            MOCK_INFO[index] = { ...MOCK_INFO[index], text };
-            return MOCK_INFO[index];
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
-        throw new Error('Info not found');
+        return config;
     },
-
-    delete: async (id) => {
-        await delay(600);
-        const index = MOCK_INFO.findIndex(i => i.id === id);
-        if (index !== -1) {
-            MOCK_INFO.splice(index, 1);
-            return true;
-        }
-        throw new Error('Info not found');
+    (error) => {
+        return Promise.reject(error);
     }
+);
+
+// Response interceptor to handle token expiration
+apiClient.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            // Don't redirect for OTP verification - let the component handle it
+            if (error.config.url && error.config.url.includes('verify-user')) {
+                return Promise.reject(error);
+            }
+
+            // Token expired or invalid
+            localStorage.removeItem("authToken");
+            localStorage.removeItem("role");
+
+        }
+        return Promise.reject(error);
+    }
+);
+
+export default {
+    index: () => apiClient.post(`admin/important-info/showall`),
+    store: (userData) => apiClient.post(`admin/important-info/create`, userData),
+    update: (id, userData) => apiClient.post(`admin/important-info/update/${id}`, userData),
+
+
 };

@@ -1,0 +1,138 @@
+.info-editor-container {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e2e8f0;
+    align-items: center;
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.25rem;
+    background-color: transparent;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+    background-color: #e2e8f0;
+    color: #1f2937;
+}
+
+.toolbar-btn.is-active {
+    background-color: #003366;
+    /* Primary color */
+    color: #ffffff;
+}
+
+.toolbar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 1.5rem;
+    background-color: #cbd5e1;
+    margin: 0 0.5rem;
+}
+
+.ProseMirror {
+    outline: none;
+    padding: 1rem;
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #334155;
+    min-height: 300px;
+}
+
+.ProseMirror>*+* {
+    margin-top: 0.75em;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+    padding: 0 1rem;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+    line-height: 1.1;
+}
+
+.ProseMirror code {
+    background-color: #f1f5f9;
+    padding: 0.1em 0.3em;
+    border-radius: 0.25rem;
+    color: #64748b;
+}
+
+.ProseMirror pre {
+    background: #0d0d0d;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+}
+
+.ProseMirror pre code {
+    color: inherit;
+    padding: 0;
+    background: none;
+    font-size: 0.8rem;
+}
+
+.ProseMirror blockquote {
+    padding-left: 1rem;
+    border-left: 3px solid #e2e8f0;
+    margin-left: 0;
+    margin-right: 0;
+    font-style: italic;
+    color: #64748b;
+}
+
+.ProseMirror hr {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 2rem 0;
+}
+
+/* Placeholder */
+.ProseMirror p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
+
+/* Link */
+.ProseMirror a {
+    color: #003366;
+    text-decoration: underline;
+    cursor: pointer;
+}
