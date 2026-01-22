@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Table, Button, InputGroup, Form, Spinner, Alert } from 'react-bootstrap';
 import { Plus, Search, PenLine, Trash2 } from 'lucide-react';
-import { urlService } from '../services/urlService';
+import formStackService from '../services/formStackService';
 import UrlModal from '../components/UrlModal';
 import Pagination from '../components/Pagination';
 
@@ -25,8 +25,10 @@ const FormstackList = () => {
     const fetchUrls = async () => {
         try {
             setLoading(true);
-            const data = await urlService.getUrls('formstack');
-            setUrls(data);
+            const response = await formStackService.index();
+            const data = response.data.form_stack_url.data;
+            // Handle Laravel resource or direct array
+            setUrls(Array.isArray(data) ? data : (data.data || []));
         } catch (err) {
             setError('Failed to load Formstack URLs.');
         } finally {
@@ -47,7 +49,7 @@ const FormstackList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Delete this URL?')) {
             try {
-                await urlService.deleteUrl('formstack', id);
+                await formStackService.delete(id);
                 fetchUrls();
             } catch (err) {
                 alert('Failed to delete URL');
@@ -58,9 +60,9 @@ const FormstackList = () => {
     const handleModalSubmit = async (data) => {
         try {
             if (editingUrl) {
-                await urlService.updateUrl('formstack', editingUrl.id, data);
+                await formStackService.update(editingUrl.id, data);
             } else {
-                await urlService.createUrl('formstack', data);
+                await formStackService.store(data);
             }
             setShowModal(false);
             fetchUrls();
@@ -70,7 +72,9 @@ const FormstackList = () => {
     };
 
     // Filter Logic
-    const filteredUrls = urls.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredUrls = Array.isArray(urls)
+        ? urls.filter(u => (u.title || u.name || '').toLowerCase().includes(searchTerm.toLowerCase()))
+        : [];
 
     // Pagination Logic
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -115,7 +119,7 @@ const FormstackList = () => {
                     <Table hover responsive className="mb-0 align-middle">
                         <thead className="bg-light">
                             <tr>
-                                <th className="ps-4 py-3 text-muted fw-medium">Name</th>
+                                <th className="ps-4 py-3 text-muted fw-medium">Title</th>
                                 <th className="py-3 text-muted fw-medium">URL</th>
                                 <th className="pe-4 py-3 text-center text-muted fw-medium" style={{ width: '120px' }}>Actions</th>
                             </tr>
@@ -126,8 +130,8 @@ const FormstackList = () => {
                             ) : currentItems.length > 0 ? (
                                 currentItems.map(url => (
                                     <tr key={url.id}>
-                                        <td className="ps-4 fw-medium">{url.name}</td>
-                                        <td><a href={url.url} target="_blank" rel="noopener noreferrer" className="text-decoration-none">{url.url}</a></td>
+                                        <td className="ps-4 fw-medium">{url.title || url.name}</td>
+                                        <td><a href={url.url || url.URL} target="_blank" rel="noopener noreferrer" className="text-decoration-none">{url.url || url.URL}</a></td>
                                         <td className="pe-4 text-center">
                                             <Button variant="link" className="p-1 text-success me-2" onClick={() => handleEdit(url)}><PenLine size={18} /></Button>
                                             <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(url.id)}><Trash2 size={18} /></Button>

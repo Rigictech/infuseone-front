@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
 const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
-    const [formData, setFormData] = useState({ name: '', url: '' });
+    const [formData, setFormData] = useState({ title: '', URL: '' });
     const [validated, setValidated] = useState(false);
 
     useEffect(() => {
         if (initialData) {
-            setFormData({ name: initialData.name, url: initialData.url });
+            setFormData({
+                title: initialData.title || initialData.name || '',
+                URL: initialData.url || initialData.URL || ''
+            });
         } else {
-            setFormData({ name: '', url: '' });
+            setFormData({ title: '', URL: '' });
         }
         setValidated(false);
     }, [initialData, show]);
@@ -37,26 +40,26 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
             </Modal.Header>
             <Modal.Body>
                 <Form noValidate validated={validated} onSubmit={handleSubmit} id="urlForm">
-                    <Form.Group className="mb-3" controlId="name">
-                        <Form.Label className="fw-medium">Name</Form.Label>
+                    <Form.Group className="mb-3" controlId="title">
+                        <Form.Label className="fw-medium">Title</Form.Label>
                         <Form.Control
                             required
                             type="text"
-                            name="name"
-                            placeholder="Enter name"
-                            value={formData.name}
+                            name="title"
+                            placeholder="Enter title"
+                            value={formData.title}
                             onChange={handleChange}
                         />
-                        <Form.Control.Feedback type="invalid">Name is required.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="url">
+                    <Form.Group className="mb-3" controlId="URL">
                         <Form.Label className="fw-medium">URL</Form.Label>
                         <Form.Control
                             required
                             type="url"
-                            name="url"
+                            name="URL"
                             placeholder="https://example.com"
-                            value={formData.url}
+                            value={formData.URL}
                             onChange={handleChange}
                         />
                         <Form.Control.Feedback type="invalid">Please enter a valid URL.</Form.Control.Feedback>
