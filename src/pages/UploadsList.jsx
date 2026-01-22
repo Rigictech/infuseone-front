@@ -11,6 +11,9 @@ const UploadsList = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const role = localStorage.getItem('role');
+    const isAdmin = role === 'Admin';
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -115,13 +118,15 @@ const UploadsList = () => {
                                 onChange={e => setSearchTerm(e.target.value)}
                             />
                         </InputGroup>
-                        <Button
-                            className="rounded-pill px-4"
-                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                            onClick={handleAdd}
-                        >
-                            <Plus size={18} className="me-2" />Add Upload
-                        </Button>
+                        {isAdmin && (
+                            <Button
+                                className="rounded-pill px-4"
+                                style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                                onClick={handleAdd}
+                            >
+                                <Plus size={18} className="me-2" />Add Upload
+                            </Button>
+                        )}
                     </div>
                 </Card.Header>
                 <Card.Body className="p-0">
@@ -170,8 +175,12 @@ const UploadsList = () => {
                                                     >
                                                         <Download size={18} />
                                                     </Button>
-                                                    <Button variant="link" className="p-1 text-success" onClick={() => handleEdit(upload)} title="Edit"><PenLine size={18} /></Button>
-                                                    <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(upload.id)} title="Delete"><Trash2 size={18} /></Button>
+                                                    {isAdmin && (
+                                                        <>
+                                                            <Button variant="link" className="p-1 text-success" onClick={() => handleEdit(upload)} title="Edit"><PenLine size={18} /></Button>
+                                                            <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(upload.id)} title="Delete"><Trash2 size={18} /></Button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>

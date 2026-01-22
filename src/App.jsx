@@ -9,7 +9,20 @@ import WebsiteList from "./pages/WebsiteList";
 import InfoManager from "./pages/InfoManager";
 import UploadsList from "./pages/UploadsList";
 import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
 import { UserProvider } from "./context/UserContext";
+
+
+const RootRedirect = () => {
+  debugger
+  const role = localStorage.getItem('role');
+  return role === 'Admin' ? <Navigate to="users-list" replace /> : <Navigate to="formstack-list" replace />;
+};
+
+const AdminRoute = ({ children }) => {
+  const role = localStorage.getItem('role');
+  return role === 'Admin' ? children : <NotFound />;
+};
 
 function App() {
   return (
@@ -24,8 +37,8 @@ function App() {
           {/* Protected */}
           <Route path="/" element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>
-              <Route index element={<Navigate to="users-list" replace />} />
-              <Route path="users-list" element={<UserManagement />} />
+              <Route index element={<RootRedirect />} />
+              <Route path="users-list" element={<AdminRoute><UserManagement /></AdminRoute>} />
               <Route path="formstack-list" element={<FormstackList />} />
               <Route path="website-list" element={<WebsiteList />} />
               <Route path="info" element={<InfoManager />} />
@@ -35,7 +48,7 @@ function App() {
           </Route>
 
           {/* Catch all */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>

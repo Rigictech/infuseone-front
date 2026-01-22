@@ -6,12 +6,30 @@ const UserContext = createContext(null);
 const bumpVersion = () => Date.now();
 
 export const UserProvider = ({ children }) => {
-    const [userProfile, setUserProfile] = useState({
-        name: 'Admin User',
-        email: 'admin@example.com',
-        role: 'Administrator',
-        profile_image: null,
-        avatarVersion: bumpVersion(),
+    const [userProfile, setUserProfile] = useState(() => {
+        const stored = localStorage.getItem('user');
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                // Ensure we have at least the basic structure if parsing succeeds
+                return {
+                    name: parsed.name || '',
+                    email: parsed.email || '',
+                    role: parsed.role || '',
+                    profile_image: parsed.profile_image || parsed.avatar || null,
+                    avatarVersion: bumpVersion(),
+                };
+            } catch (e) {
+                console.error("Failed to parse user from local storage", e);
+            }
+        }
+        return {
+            name: '',
+            email: '',
+            role: '',
+            profile_image: null,
+            avatarVersion: bumpVersion(),
+        };
     });
 
     const refreshUser = useCallback(async () => {

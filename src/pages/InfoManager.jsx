@@ -127,6 +127,10 @@ const InfoManager = () => {
     const [status, setStatus] = useState({ type: '', message: '' });
     const [, forceUpdate] = useState(0); // For toolbar updates
 
+    // Role check
+    const role = localStorage.getItem('role');
+    const isAdmin = role === 'Admin';
+
     const extensions = useMemo(() => [
         StarterKit,
         Underline,
@@ -142,6 +146,7 @@ const InfoManager = () => {
     ], []);
 
     const editor = useEditor({
+        editable: isAdmin,
         extensions,
         content: '',
         onTransaction: () => {
@@ -238,15 +243,17 @@ const InfoManager = () => {
             <Card className="border-0 shadow-sm" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <Card.Header className="bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5 className="mb-0">Info Manager</h5>
-                    <Button
-                        variant="primary"
-                        onClick={handleSave}
-                        disabled={saving || loading}
-                        style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                    >
-                        {saving ? <Spinner animation="border" size="sm" className="me-2" /> : <Save size={18} className="me-2" />}
-                        Save Changes
-                    </Button>
+                    {isAdmin && (
+                        <Button
+                            variant="primary"
+                            onClick={handleSave}
+                            disabled={saving || loading}
+                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                        >
+                            {saving ? <Spinner animation="border" size="sm" className="me-2" /> : <Save size={18} className="me-2" />}
+                            Save Changes
+                        </Button>
+                    )}
                 </Card.Header>
                 <Card.Body className="p-0 d-flex flex-column" style={{ flexGrow: 1, overflow: 'hidden' }}>
                     {loading ? (
@@ -255,7 +262,7 @@ const InfoManager = () => {
                         </div>
                     ) : (
                         <div className="info-editor-container h-100 border-0 rounded-0">
-                            <MenuBar editor={editor} />
+                            {isAdmin && <MenuBar editor={editor} />}
                             <EditorContent editor={editor} className="flex-grow-1 overflow-auto" />
                         </div>
                     )}

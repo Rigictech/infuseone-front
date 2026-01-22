@@ -11,6 +11,9 @@ const FormstackList = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const role = localStorage.getItem('role');
+    const isAdmin = role === 'Admin';
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -106,13 +109,15 @@ const FormstackList = () => {
                                 onChange={e => setSearchTerm(e.target.value)}
                             />
                         </InputGroup>
-                        <Button
-                            className="rounded-pill px-4"
-                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                            onClick={handleAdd}
-                        >
-                            <Plus size={18} className="me-2" />Add Form
-                        </Button>
+                        {isAdmin && (
+                            <Button
+                                className="rounded-pill px-4"
+                                style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                                onClick={handleAdd}
+                            >
+                                <Plus size={18} className="me-2" />Add Form
+                            </Button>
+                        )}
                     </div>
                 </Card.Header>
                 <Card.Body className="p-0">
@@ -121,7 +126,7 @@ const FormstackList = () => {
                             <tr>
                                 <th className="ps-4 py-3 text-muted fw-medium">Title</th>
                                 <th className="py-3 text-muted fw-medium">URL</th>
-                                <th className="pe-4 py-3 text-center text-muted fw-medium" style={{ width: '120px' }}>Actions</th>
+                                {isAdmin && <th className="pe-4 py-3 text-center text-muted fw-medium" style={{ width: '120px' }}>Actions</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -132,10 +137,12 @@ const FormstackList = () => {
                                     <tr key={url.id}>
                                         <td className="ps-4 fw-medium">{url.title || url.name}</td>
                                         <td><a href={url.url || url.URL} target="_blank" rel="noopener noreferrer" className="text-decoration-none">{url.url || url.URL}</a></td>
-                                        <td className="pe-4 text-center">
-                                            <Button variant="link" className="p-1 text-success me-2" onClick={() => handleEdit(url)}><PenLine size={18} /></Button>
-                                            <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(url.id)}><Trash2 size={18} /></Button>
-                                        </td>
+                                        {isAdmin && (
+                                            <td className="pe-4 text-center">
+                                                <Button variant="link" className="p-1 text-success me-2" onClick={() => handleEdit(url)}><PenLine size={18} /></Button>
+                                                <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(url.id)}><Trash2 size={18} /></Button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (

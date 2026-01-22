@@ -11,6 +11,9 @@ const UserManagement = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const role = localStorage.getItem('role');
+    const isAdmin = role === 'Admin';
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -146,13 +149,15 @@ const UserManagement = () => {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </InputGroup>
-                        <Button
-                            className="rounded-pill px-4"
-                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                            onClick={handleAddUser}
-                        >
-                            <Plus size={18} className="me-2" />Add User
-                        </Button>
+                        {isAdmin && (
+                            <Button
+                                className="rounded-pill px-4"
+                                style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                                onClick={handleAddUser}
+                            >
+                                <Plus size={18} className="me-2" />Add User
+                            </Button>
+                        )}
                     </div>
                 </Card.Header>
                 <Card.Body className="p-0">
@@ -162,7 +167,7 @@ const UserManagement = () => {
                                 <th className="ps-4 text-muted fw-medium py-3" style={{ width: '60px' }}>Profile</th>
                                 <th className="text-muted fw-medium py-3" style={{ width: '30%' }}>Name</th>
                                 <th className="text-muted fw-medium py-3" style={{ width: '40%' }}>Email</th>
-                                <th className="pe-4 text-end text-muted fw-medium py-3" style={{ width: '110px' }}>Actions</th>
+                                {isAdmin && <th className="pe-4 text-end text-muted fw-medium py-3" style={{ width: '110px' }}>Actions</th>}
                             </tr>
                         </thead>
                         <tbody>
@@ -199,12 +204,14 @@ const UserManagement = () => {
                                         </td>
                                         <td className="text-muted">{user.name}</td>
                                         <td className="text-muted">{user.email}</td>
-                                        <td className="pe-4 text-end">
-                                            <div className="d-flex justify-content-end gap-2">
-                                                <Button variant="light" size="sm" className="text-success" onClick={() => handleEditUser(user)}><PenLine size={16} /></Button>
-                                                <Button variant="light" size="sm" className="text-danger" onClick={() => handleDeleteUser(user.id)}><Trash2 size={16} /></Button>
-                                            </div>
-                                        </td>
+                                        {isAdmin && (
+                                            <td className="pe-4 text-end">
+                                                <div className="d-flex justify-content-end gap-2">
+                                                    <Button variant="light" size="sm" className="text-success" onClick={() => handleEditUser(user)}><PenLine size={16} /></Button>
+                                                    <Button variant="light" size="sm" className="text-danger" onClick={() => handleDeleteUser(user.id)}><Trash2 size={16} /></Button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
