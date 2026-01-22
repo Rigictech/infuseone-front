@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
                 <div className="sidebar-header">
                     <div className="brand-logo">
                         <div className="logo-icon">
-                            <Image src="/favicon.png" alt="Infuse One Logo" className="sidebar-logo-img" fluid />
+                            <Image src="./favicon.png" alt="Infuse One Logo" className="sidebar-logo-img" fluid />
                         </div>
                     </div>
                 </div>

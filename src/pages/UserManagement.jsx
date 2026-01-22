@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Table, Button, Form, InputGroup, Spinner, Alert } from 'react-bootstrap';
-import { Search, Plus, Eye, PenLine, Trash2 } from 'lucide-react';
+import { Search, Plus, PenLine, Trash2 } from 'lucide-react';
 import userService from '../services/AdminUserService';
 import UserModal from '../components/UserModal';
 import Pagination from '../components/Pagination';

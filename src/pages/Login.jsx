@@ -56,7 +56,7 @@ const Login = () => {
                 <Card.Body className="p-4 p-sm-5">
                     <div className="text-center mb-4">
                         <img
-                            src="/favicon.png"
+                            src="./favicon.png"
                             alt="Infuse One Logo"
                             height={100}
                             width="auto"
