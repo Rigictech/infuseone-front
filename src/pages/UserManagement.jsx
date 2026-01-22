@@ -26,8 +26,6 @@ const UserManagement = () => {
         try {
             setLoading(true);
             const response = await userService.index({});
-            console.log("User API Response:", response);
-            // Safely determine the array source
             let userList = [];
             if (response.data && Array.isArray(response.data.user.data)) {
                 userList = response.data.user.data;

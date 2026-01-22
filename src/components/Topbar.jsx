@@ -1,10 +1,11 @@
 import React from 'react';
-import { Navbar, Dropdown, Image, Container } from 'react-bootstrap';
-import { User, LogOut } from 'lucide-react';
+import { Navbar, Dropdown, Image, Container, Button } from 'react-bootstrap';
+import { User, LogOut, Menu } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const Topbar = () => {
+const Topbar = ({ onMenuClick }) => {
+
     const { userProfile } = useUser();
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,13 +23,20 @@ const Topbar = () => {
     };
 
     const handleLogout = () => {
-        // Implement logout logic here (e.g., clear tokens)
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('role');
+        localStorage.removeItem('user');
         navigate('/login');
     };
 
     return (
         <Navbar bg="white" variant="light" className="shadow-sm border-bottom py-2 sticky-top">
             <Container fluid className="px-4">
+                <div className="d-flex align-items-center">
+                    <Button variant="link" className="p-0 text-dark me-3 mobile-menu-btn" onClick={onMenuClick}>
+                        <Menu size={24} />
+                    </Button>
+                </div>
                 <Navbar.Brand className="fw-bold text-primary d-none d-md-block">
                     {getPageTitle(location.pathname)}
                 </Navbar.Brand>

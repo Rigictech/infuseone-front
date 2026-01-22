@@ -40,5 +40,9 @@ apiClient.interceptors.response.use(
 
 export default {
     login: (userData) => apiClient.post(`session/login`, userData),
+    logout: () => apiClient.post(`session/logout`),
+    changePassword: (userData) => apiClient.post(`session/change-password`, userData),
+    updateProfile: (userData) => apiClient.post(`session/update-profile`, userData),
+    updateProfileImage: (userData) => apiClient.post(`session/update-profile-image`, userData),
 
 };

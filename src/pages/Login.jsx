@@ -20,6 +20,7 @@ const Login = () => {
     };
 
     const handleSubmit = async (e) => {
+        debugger
         e.preventDefault();
         const validationErrors = validate();
         if (Object.keys(validationErrors).length > 0) {
@@ -32,10 +33,11 @@ const Login = () => {
                 const response = await userService.login({ email, password, "device_name": "web" });
 
                 // Assuming response.data.token or similar structure
-                const { token, role } = response.data; // Adjust based on actual API response
+                const { token, type, user } = response.data; // Adjust based on actual API response
                 if (token) {
                     localStorage.setItem('authToken', token);
-                    if (role) localStorage.setItem('role', role);
+                    if (type) localStorage.setItem('role', type);
+                    localStorage.setItem('user', JSON.stringify(user));
                     navigate('/');
                 } else {
                     setApiError('Login failed: No token received');
