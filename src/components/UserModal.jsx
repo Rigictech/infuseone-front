@@ -1,34 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col, InputGroup } from 'react-bootstrap';
-import { Eye, EyeOff, RefreshCw, Copy, Check, WandSparkles } from 'lucide-react';
+import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 
 const UserModal = ({ show, onHide, onSubmit, user, title }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        password: '',
     });
     const [validated, setValidated] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         if (user) {
             setFormData({
                 name: user.name || '',
                 email: user.email || '',
-                password: '', // Usually don't show existing password
             });
         } else {
             setFormData({
                 name: '',
                 email: '',
-                password: '',
             });
         }
         setValidated(false);
-        setCopied(false);
-        setShowPassword(false);
     }, [user, show]);
 
     const handleChange = (e) => {
@@ -40,22 +32,13 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
     };
 
     const generatePassword = () => {
-        const length = 8;
+        const length = 12;
         const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
         let newPassword = "";
         for (let i = 0, n = charset.length; i < length; ++i) {
             newPassword += charset.charAt(Math.floor(Math.random() * n));
         }
-        setFormData(prev => ({ ...prev, password: newPassword }));
-        setCopied(false);
-    };
-
-    const copyToClipboard = () => {
-        if (formData.password) {
-            navigator.clipboard.writeText(formData.password);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
+        return newPassword;
     };
 
     const handleSubmit = (e) => {
@@ -66,7 +49,13 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
             setValidated(true);
             return;
         }
-        onSubmit(formData);
+
+        const dataToSubmit = { ...formData };
+        if (!user) {
+            dataToSubmit.password = generatePassword();
+        }
+
+        onSubmit(dataToSubmit);
     };
 
     return (
@@ -109,53 +98,6 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     Please enter a valid email.
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                        </Col>
-
-                        <Col xs={12}>
-                            <Form.Group controlId="password">
-                                <Form.Label className="fw-medium">Password</Form.Label>
-                                <div className="position-relative">
-                                    <Form.Control
-                                        required={!user} // Password required only for new users
-                                        type={showPassword ? "text" : "password"}
-                                        name="password"
-                                        placeholder={user ? "Leave blank to keep unchanged" : "Enter password"}
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        minLength={6}
-                                        autoComplete="new-password"
-                                        style={{ paddingRight: '120px' }}
-                                    />
-                                    <div className="position-absolute top-50 end-0 translate-middle-y pe-3 d-flex gap-3 align-items-center">
-                                        <WandSparkles
-                                            size={18}
-                                            className="text-secondary"
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={generatePassword}
-                                            title="Generate Strong Password"
-                                        />
-                                        <div
-                                            className="text-secondary"
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={copyToClipboard}
-                                            title="Copy to Clipboard"
-                                        >
-                                            {copied ? <Check size={18} className="text-success" /> : <Copy size={18} />}
-                                        </div>
-                                        <div
-                                            className="text-secondary"
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            title={showPassword ? "Hide" : "Show"}
-                                        >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </div>
-                                    </div>
-                                </div>
-                                <Form.Control.Feedback type="invalid">
-                                    Password is required (min 6 chars).
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Col>

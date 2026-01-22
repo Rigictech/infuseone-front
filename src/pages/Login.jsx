@@ -76,7 +76,7 @@ const Login = () => {
                                     setEmail(e.target.value);
                                     if (errors.email) setErrors({ ...errors, email: null });
                                 }}
-                                placeholder="admin@example.com"
+                                placeholder="Enter your email"
                                 isInvalid={!!errors.email}
                             />
                             <Form.Control.Feedback type="invalid">
@@ -93,7 +93,7 @@ const Login = () => {
                                     setPassword(e.target.value);
                                     if (errors.password) setErrors({ ...errors, password: null });
                                 }}
-                                placeholder="••••••••"
+                                placeholder="Enter your password"
                                 isInvalid={!!errors.password}
                             />
                             <Form.Control.Feedback type="invalid">
