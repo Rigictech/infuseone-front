@@ -47,4 +47,4 @@ const webURLService = {
 
 };
 
-export default webURLService;
+export default webURLService();
