@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, InputGroup, Image, Alert, Spinner } from 'react-bootstrap';
-import { Eye, EyeOff, PenLine } from 'lucide-react';
+import { Container, Row, Col, Card, Form, Button, Image, Alert, Spinner } from 'react-bootstrap';
+import { Eye, EyeOff, PenLine, Copy, Check, WandSparkles } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import userService from '../services/userService';
 import '../styles/Profile.css';
@@ -10,7 +10,6 @@ const Profile = () => {
 
     const [name, setName] = useState(userProfile.name);
     const [email, setEmail] = useState(userProfile.email);
-    const [profile, setProfile] = useState();
     const [passwords, setPasswords] = useState({
         currentPassword: '',
         newPassword: ''
@@ -24,6 +23,7 @@ const Profile = () => {
         current: false,
         new: false
     });
+    const [copied, setCopied] = useState(false);
     const [status, setStatus] = useState({
         type: '', // 'success' or 'error'
         message: ''
@@ -147,6 +147,25 @@ const Profile = () => {
         setShowPassword(prev => ({ ...prev, [field]: !prev[field] }));
     };
 
+    const generatePassword = () => {
+        const length = 12;
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        let newPassword = "";
+        for (let i = 0, n = charset.length; i < length; ++i) {
+            newPassword += charset.charAt(Math.floor(Math.random() * n));
+        }
+        setPasswords(prev => ({ ...prev, newPassword: newPassword }));
+        setCopied(false);
+    };
+
+    const copyToClipboard = () => {
+        if (passwords.newPassword) {
+            navigator.clipboard.writeText(passwords.newPassword);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
     return (
         <Container fluid className="py-4">
             {status.message && (
@@ -255,7 +274,7 @@ const Profile = () => {
                             <Form onSubmit={handlePasswordUpdate}>
                                 <Form.Group className="mb-3" controlId="currentPassword">
                                     <Form.Label className="fw-medium small">Current Password</Form.Label>
-                                    <InputGroup>
+                                    <div className="position-relative">
                                         <Form.Control
                                             type={showPassword.current ? "text" : "password"}
                                             value={passwords.currentPassword}
@@ -263,34 +282,51 @@ const Profile = () => {
                                             onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
                                             required
                                         />
-                                        <Button
-                                            variant="outline-secondary"
-                                            className="border-start-0 border"
-                                            onClick={() => togglePasswordVisibility('current')}
+                                        <div className="position-absolute top-50 end-0 translate-middle-y pe-3 d-flex gap-3 align-items-center text-secondary"
+                                            onClick={() => setShowPassword({ ...showPassword, current: !showPassword.current })}
+                                            style={{ cursor: 'pointer' }}
+                                            title={showPassword.current ? "Hide" : "Show"}
                                         >
-                                            {showPassword.current ? <EyeOff size={16} /> : <Eye size={16} />}
-                                        </Button>
-                                    </InputGroup>
+                                            {showPassword.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </div>
+                                    </div>
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="newPassword">
                                     <Form.Label className="fw-medium small">New Password</Form.Label>
-                                    <InputGroup>
+                                    <div className="position-relative">
                                         <Form.Control
                                             type={showPassword.new ? "text" : "password"}
                                             value={passwords.newPassword}
                                             placeholder="Enter your new password"
                                             onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                                             required
+                                            style={{ paddingRight: '120px' }}
                                         />
-                                        <Button
-                                            variant="outline-secondary"
-                                            className="border-start-0 border"
-                                            onClick={() => togglePasswordVisibility('new')}
+                                        <div className="position-absolute top-50 end-0 translate-middle-y pe-3 d-flex gap-3 align-items-center text-secondary"
                                         >
-                                            {showPassword.new ? <EyeOff size={16} /> : <Eye size={16} />}
-                                        </Button>
-                                    </InputGroup>
+                                            <WandSparkles
+                                                size={18}
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={generatePassword}
+                                                title="Generate Strong Password"
+                                            />
+                                            <div
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={copyToClipboard}
+                                                title="Copy to Clipboard"
+                                            >
+                                                {copied ? <Check size={18} className="text-success" /> : <Copy size={18} />}
+                                            </div>
+                                            <div
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => togglePasswordVisibility('new')}
+                                                title={showPassword.new ? "Hide" : "Show"}
+                                            >
+                                                {showPassword.new ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Form.Group>
                                 <div className="text-end">
                                     <Button
