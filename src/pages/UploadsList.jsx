@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Table, Button, Form, InputGroup, Spinner, Alert } from 'react-bootstrap';
 import { Plus, Search, PenLine, Trash2, Download, FileText } from 'lucide-react';
-import { uploadService } from '../services/uploadService';
+import uploadService from '../services/uploadService';
 import UploadModal from '../components/UploadModal';
 import Pagination from '../components/Pagination';
 
@@ -25,8 +25,19 @@ const UploadsList = () => {
     const fetchUploads = async () => {
         try {
             setLoading(true);
-            const data = await uploadService.getUploads();
-            setUploads(data);
+            const response = await uploadService.index();
+            const data = response.data;
+            let list = [];
+            if (Array.isArray(data)) {
+                list = data;
+            } else if (data.data && Array.isArray(data.data)) {
+                list = data.data;
+            } else if (data.upload_pdf && data.upload_pdf.data) {
+                list = data.upload_pdf.data;
+            } else {
+                list = data.data || [];
+            }
+            setUploads(list);
         } catch (err) {
             setError('Failed to load uploads.');
         } finally {
@@ -47,7 +58,7 @@ const UploadsList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Delete this file?')) {
             try {
-                await uploadService.deleteUpload(id);
+                await uploadService.delete(id);
                 fetchUploads();
             } catch (err) {
                 alert('Failed to delete upload');
@@ -55,20 +66,14 @@ const UploadsList = () => {
         }
     };
 
-    const handleDownload = async (fileName) => {
-        try {
-            await uploadService.downloadFile(fileName);
-        } catch (err) {
-            alert('Download failed');
-        }
-    };
+
 
     const handleModalSubmit = async (formData) => {
         try {
             if (editingUpload) {
-                await uploadService.updateUpload(editingUpload.id, formData);
+                await uploadService.update(editingUpload.id, formData);
             } else {
-                await uploadService.uploadFile(formData);
+                await uploadService.store(formData);
             }
             setShowModal(false);
             fetchUploads();
@@ -78,7 +83,7 @@ const UploadsList = () => {
     };
 
     // Filter Logic
-    const filteredUploads = uploads.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const filteredUploads = uploads.filter(u => (u.name || u.title || '').toLowerCase().includes(searchTerm.toLowerCase()));
 
     // Pagination Logic
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -132,24 +137,46 @@ const UploadsList = () => {
                             {loading ? (
                                 <tr><td colSpan="3" className="text-center py-5"><Spinner animation="border" variant="primary" /></td></tr>
                             ) : currentItems.length > 0 ? (
-                                currentItems.map(upload => (
-                                    <tr key={upload.id}>
-                                        <td className="ps-4 fw-medium">
-                                            <div className="d-flex align-items-center gap-2">
-                                                <div className="bg-light p-2 rounded text-danger"><FileText size={18} /></div>
-                                                {upload.name}
-                                            </div>
-                                        </td>
-                                        <td className="text-muted small">{upload.uploadDate}</td>
-                                        <td className="pe-4 text-center">
-                                            <div className="d-flex justify-content-center gap-1">
-                                                <Button variant="link" className="p-1 text-primary" onClick={() => handleDownload(upload.fileName)} title="Download"><Download size={18} /></Button>
-                                                <Button variant="link" className="p-1 text-success" onClick={() => handleEdit(upload)} title="Edit"><PenLine size={18} /></Button>
-                                                <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(upload.id)} title="Delete"><Trash2 size={18} /></Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
+                                currentItems.map(upload => {
+                                    const baseUrl = import.meta.env.VITE_LARAVEL_IMAGE_URL || '';
+                                    const rawPath = upload.pdf || '';
+                                    // Ensure the path targets the 'pdfs' directory in storage
+                                    // Some records might return just the filename, others might have the folder
+                                    const pdfPath = rawPath.startsWith('pdfs/') ? rawPath : `pdfs/${rawPath}`;
+                                    const fullUrl = `${baseUrl}${pdfPath}`;
+
+                                    return (
+                                        <tr key={upload.id}>
+                                            <td className="ps-4 fw-medium">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <div className="bg-light p-2 rounded text-danger"><FileText size={18} /></div>
+                                                    {upload.name || upload.title}
+                                                </div>
+                                            </td>
+                                            <td className="text-muted small">
+                                                {upload.created_at ? new Date(upload.created_at).toLocaleDateString() : (upload.uploadDate || '-')}
+                                            </td>
+                                            <td className="pe-4 text-center">
+                                                <div className="d-flex justify-content-center gap-1">
+                                                    <Button
+                                                        variant="link"
+                                                        className="p-1 text-primary"
+                                                        href={fullUrl}
+                                                        download
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        title="Download"
+                                                        disabled={!pdfPath}
+                                                    >
+                                                        <Download size={18} />
+                                                    </Button>
+                                                    <Button variant="link" className="p-1 text-success" onClick={() => handleEdit(upload)} title="Edit"><PenLine size={18} /></Button>
+                                                    <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(upload.id)} title="Delete"><Trash2 size={18} /></Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             ) : (
                                 <tr><td colSpan="3" className="text-center py-5 text-muted">No uploads found.</td></tr>
                             )}

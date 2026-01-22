@@ -47,4 +47,4 @@ const formStackService = {
 
 };
 
-export default formStackService();
+export default formStackService;

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 
 const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
-    const [name, setName] = useState('');
+    const [title, setTitle] = useState('');
     const [file, setFile] = useState(null);
     const [error, setError] = useState(null);
     const [validated, setValidated] = useState(false);
@@ -10,10 +10,10 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
 
     useEffect(() => {
         if (initialData) {
-            setName(initialData.name);
+            setTitle(initialData.title);
             setFile(null); // Reset file on edit, user might not change it
         } else {
-            setName('');
+            setTitle('');
             setFile(null);
         }
         setError(null);
@@ -58,9 +58,9 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
         }
 
         const formData = new FormData();
-        formData.append('name', name);
+        formData.append('title', title);
         if (file) {
-            formData.append('file', file);
+            formData.append('pdf', file);
         }
 
         onSubmit(formData);
@@ -75,19 +75,24 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                 {error && <Alert variant="danger" className="py-2 text-center small">{error}</Alert>}
                 <Form noValidate validated={validated} onSubmit={handleSubmit} id="uploadForm">
                     <Form.Group className="mb-3" controlId="uploadName">
-                        <Form.Label className="fw-medium">Document Name</Form.Label>
+                        <Form.Label className="fw-medium">Document Title</Form.Label>
                         <Form.Control
                             required
                             type="text"
                             placeholder="e.g., Annual Report"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                         />
-                        <Form.Control.Feedback type="invalid">Name is required.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="uploadFile">
                         <Form.Label className="fw-medium">Upload File (PDF)</Form.Label>
+                        {initialData && initialData.pdf && !file && (
+                            <div className="mb-2 text-muted small">
+                                Current file: <strong>{initialData.pdf.split('/').pop()}</strong>
+                            </div>
+                        )}
                         <Form.Control
                             type="file"
                             accept=".pdf"

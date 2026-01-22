@@ -45,4 +45,4 @@ const uploadService = {
     delete: (id) => apiClient.post(`admin/upload-pdf/destroy/${id}`),
 };
 
-export default uploadService();
+export default uploadService;

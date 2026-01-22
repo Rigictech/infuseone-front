@@ -42,4 +42,4 @@ const AdminUserService = {
 
 };
 
-export default AdminUserService();
+export default AdminUserService;
