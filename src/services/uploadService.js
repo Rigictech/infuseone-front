@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
 );
 
 const uploadService = {
-    index: () => apiClient.post(`admin/upload-pdf/showall`),
+    index: (page = 1) => apiClient.post(`admin/upload-pdf/showall?page=${page}`),
     store: (userData) => apiClient.post(`admin/upload-pdf/create`, userData),
     update: (id, userData) => apiClient.post(`admin/upload-pdf/update/${id}`, userData),
     delete: (id) => apiClient.post(`admin/upload-pdf/destroy/${id}`),

@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
 );
 
 const AdminUserService = {
-  index: (userData) => apiClient.post(`admin/user/showall`, userData),
+  index: (page = 1) => apiClient.post(`admin/user/showall?page=${page}`),
   store: (userData) => apiClient.post(`admin/user/create`, userData),
   destroy: (id) => apiClient.post(`admin/user/destroy/${id}`),
   update: (id, userData) => apiClient.post(`admin/user/update/${id}`, userData),

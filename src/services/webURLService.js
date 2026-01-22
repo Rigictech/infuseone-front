@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
 );
 
 const webURLService = {
-    index: () => apiClient.post(`admin/website-url/showall`),
+    index: (page = 1) => apiClient.post(`admin/website-url/showall?page=${page}`),
     store: (userData) => apiClient.post(`admin/website-url/create`, userData),
     update: (id, userData) => apiClient.post(`admin/website-url/update/${id}`, userData),
     delete: (id) => apiClient.post(`admin/website-url/destroy/${id}`),

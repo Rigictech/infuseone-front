@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
 );
 
 const formStackService = {
-    index: () => apiClient.post(`admin/form-stack-url/showall`),
+    index: (page = 1) => apiClient.post(`admin/form-stack-url/showall?page=${page}`),
     store: (userData) => apiClient.post(`admin/form-stack-url/create`, userData),
     update: (id, userData) => apiClient.post(`admin/form-stack-url/update/${id}`, userData),
     delete: (id) => apiClient.post(`admin/form-stack-url/destroy/${id}`),

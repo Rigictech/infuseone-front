@@ -13,30 +13,50 @@ const UserManagement = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const usersPerPage = 10;
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
 
     useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [currentPage]);
 
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const response = await userService.index({});
+            const response = await userService.index(currentPage);
+            const data = response.data;
+
             let userList = [];
-            if (response.data && Array.isArray(response.data.user.data)) {
-                userList = response.data.user.data;
-            } else if (response.data && Array.isArray(response.data)) {
-                userList = response.data;
-            } else if (response.data && response.data.users && Array.isArray(response.data.users)) {
-                userList = response.data.users;
-            } else {
-                console.warn("Could not find array in response, defaulting to empty", response.data);
+            let meta = {};
+
+            if (data.user) {
+                // If data.user is the paginator object
+                if (data.user.data && Array.isArray(data.user.data)) {
+                    userList = data.user.data;
+                    meta = data.user.meta; // meta fields are on the top level object usually
+                } else if (Array.isArray(data.user)) {
+                    userList = data.user;
+                }
+            } else if (data.user.data && Array.isArray(data.user.data)) {
+                userList = data.user.data;
+                meta = data.user.meta || data;
+            } else if (Array.isArray(data)) {
+                userList = data;
+            } else if (data.users && Array.isArray(data.users)) {
+                userList = data.users;
             }
+
             setUsers(userList);
+            setTotalPages(meta.last_page || 1);
+            setTotalRecords(meta.total || userList.length);
+            setStartIndex(meta.from || 1);
+            setEndIndex(meta.to || userList.length);
+
             setError(null);
         } catch (err) {
             console.error(err);
@@ -95,23 +115,17 @@ const UserManagement = () => {
         }
     };
 
-    // Filter Logic
+    // Filter Logic - Client side on current page
     const filteredUsers = users.filter(user =>
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Pagination Logic
-    const indexOfLastUser = currentPage * usersPerPage;
-    const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-    const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // Reset to page 1 on search
     useEffect(() => {
-        setCurrentPage(1);
+        // Debounce if needed
     }, [searchTerm]);
 
     return (
@@ -154,8 +168,8 @@ const UserManagement = () => {
                         <tbody>
                             {loading ? (
                                 <tr><td colSpan="4" className="text-center py-5"><Spinner animation="border" variant="primary" /></td></tr>
-                            ) : currentUsers.length > 0 ? (
-                                currentUsers.map(user => (
+                            ) : filteredUsers.length > 0 ? (
+                                filteredUsers.map(user => (
                                     <tr key={user.id}>
                                         <td className="ps-4">
                                             <div
@@ -200,14 +214,14 @@ const UserManagement = () => {
                     </Table>
                 </Card.Body>
                 <Card.Footer className="bg-white border-top-0">
-                    {!loading && filteredUsers.length > 0 && (
+                    {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={paginate}
-                            totalRecords={filteredUsers.length}
-                            startIndex={indexOfFirstUser + 1}
-                            endIndex={Math.min(indexOfLastUser, filteredUsers.length)}
+                            totalRecords={totalRecords}
+                            startIndex={startIndex}
+                            endIndex={endIndex}
                         />
                     )}
                 </Card.Footer>

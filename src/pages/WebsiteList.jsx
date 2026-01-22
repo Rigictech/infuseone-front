@@ -13,22 +13,42 @@ const WebsiteList = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
     const [editingUrl, setEditingUrl] = useState(null);
 
     useEffect(() => {
         fetchUrls();
-    }, []);
+    }, [currentPage]);
 
     const fetchUrls = async () => {
         try {
             setLoading(true);
-            const response = await webURLService.index();
-            const data = response.data.website_url.data;
-            // Handle Laravel resource or direct array
-            setUrls(Array.isArray(data) ? data : (data.data || []));
+            const response = await webURLService.index(currentPage);
+            const data = response.data;
+
+            let list = [];
+            let meta = {};
+
+            if (data.website_url) {
+                list = data.website_url.data || [];
+                meta = data.website_url.meta || {};
+            } else if (data.data && Array.isArray(data.data)) {
+                list = data.data;
+                meta = data.meta || {};
+            } else {
+                list = Array.isArray(data) ? data : (data.data || []);
+            }
+
+            setUrls(list);
+            setTotalPages(meta.last_page || 1);
+            setTotalRecords(meta.total || list.length);
+            setStartIndex(meta.from || 1);
+            setEndIndex(meta.to || list.length);
         } catch (err) {
             setError('Failed to load Website URLs.');
         } finally {
@@ -71,21 +91,15 @@ const WebsiteList = () => {
         }
     };
 
-    // Filter Logic
+    // Filter Logic - Client side on current page
     const filteredUrls = Array.isArray(urls)
         ? urls.filter(u => (u.title || u.name || '').toLowerCase().includes(searchTerm.toLowerCase()))
         : [];
 
-    // Pagination Logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredUrls.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredUrls.length / itemsPerPage);
-
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     useEffect(() => {
-        setCurrentPage(1);
+        // Reset or debounce logic if search was server-side
     }, [searchTerm]);
 
     return (
@@ -127,8 +141,8 @@ const WebsiteList = () => {
                         <tbody>
                             {loading ? (
                                 <tr><td colSpan="3" className="text-center py-5"><Spinner animation="border" variant="primary" /></td></tr>
-                            ) : currentItems.length > 0 ? (
-                                currentItems.map(url => (
+                            ) : filteredUrls.length > 0 ? (
+                                filteredUrls.map(url => (
                                     <tr key={url.id}>
                                         <td className="ps-4 fw-medium">{url.title || url.name}</td>
                                         <td><a href={url.url || url.URL} target="_blank" rel="noopener noreferrer" className="text-decoration-none">{url.url || url.URL}</a></td>
@@ -145,14 +159,14 @@ const WebsiteList = () => {
                     </Table>
                 </Card.Body>
                 <Card.Footer className="bg-white border-top-0">
-                    {!loading && filteredUrls.length > 0 && (
+                    {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={paginate}
-                            totalRecords={filteredUrls.length}
-                            startIndex={indexOfFirstItem + 1}
-                            endIndex={Math.min(indexOfLastItem, filteredUrls.length)}
+                            totalRecords={totalRecords}
+                            startIndex={startIndex}
+                            endIndex={endIndex}
                         />
                     )}
                 </Card.Footer>
