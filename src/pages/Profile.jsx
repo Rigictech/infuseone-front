@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Image, Alert, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Image, Spinner } from 'react-bootstrap';
 import { Eye, EyeOff, PenLine, Copy, Check, WandSparkles } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import userService from '../services/userService';
+import toast from 'react-hot-toast';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -24,10 +25,7 @@ const Profile = () => {
         new: false
     });
     const [copied, setCopied] = useState(false);
-    const [status, setStatus] = useState({
-        type: '', // 'success' or 'error'
-        message: ''
-    });
+
     const imageUrl = import.meta.env.VITE_LARAVEL_IMAGE_URL;
     const fileInputRef = useRef(null);
 
@@ -47,7 +45,7 @@ const Profile = () => {
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            setStatus({ type: 'error', message: 'Image size must be less than 2MB.' });
+            toast.error('Image size must be less than 2MB.');
             return;
         }
 
@@ -68,13 +66,10 @@ const Profile = () => {
                 updateUserAfterSuccess({});
                 await refreshUser();
 
-                setStatus({ type: 'success', message: 'Profile picture updated!' });
+                toast.success('Profile picture updated!');
 
             } catch (error) {
-                setStatus({
-                    type: 'error',
-                    message: error.response?.data?.message || 'Failed to update profile picture.'
-                });
+                toast.error(error.response?.data?.message || 'Failed to update profile picture.');
             } finally {
                 setLoading(false);
             }
@@ -87,7 +82,6 @@ const Profile = () => {
     const handleEmailUpdate = async (e) => {
         e.preventDefault();
         setLoadingProfile(true);
-        setStatus({ type: '', message: '' });
 
         try {
             await userService.updateProfile({ name, email });
@@ -98,13 +92,10 @@ const Profile = () => {
             // Re-fetch to ensure UI is in sync with backend (and triggers re-render everywhere)
             await refreshUser();
 
-            setStatus({ type: 'success', message: 'Profile updated successfully!' });
+            toast.success('Profile updated successfully!');
 
         } catch (error) {
-            setStatus({
-                type: 'error',
-                message: error.response?.data?.message || 'Failed to update profile.'
-            });
+            toast.error(error.response?.data?.message || 'Failed to update profile.');
         } finally {
             setLoadingProfile(false);
         }
@@ -114,16 +105,15 @@ const Profile = () => {
     const handlePasswordUpdate = async (e) => {
         e.preventDefault();
         if (!passwords.currentPassword || !passwords.newPassword) {
-            setStatus({ type: 'error', message: 'Please fill in all password fields.' });
+            toast.error('Please fill in all password fields.');
             return;
         }
         if (passwords.newPassword.length < 6) {
-            setStatus({ type: 'error', message: 'New password must be at least 6 characters.' });
+            toast.error('New password must be at least 6 characters.');
             return;
         }
 
         setLoadingPassword(true);
-        setStatus({ type: '', message: '' });
 
         try {
             await userService.changePassword({
@@ -131,13 +121,10 @@ const Profile = () => {
                 new_password: passwords.newPassword,
                 new_password_confirmation: passwords.newPassword // Often required
             });
-            setStatus({ type: 'success', message: 'Password updated successfully!' });
+            toast.success('Password updated successfully!');
             setPasswords({ currentPassword: '', newPassword: '' });
         } catch (error) {
-            setStatus({
-                type: 'error',
-                message: error.response?.data?.message || 'Failed to update password.'
-            });
+            toast.error(error.response?.data?.message || 'Failed to update password.');
         } finally {
             setLoadingPassword(false);
         }
@@ -168,11 +155,6 @@ const Profile = () => {
 
     return (
         <Container fluid className="py-4">
-            {status.message && (
-                <Alert variant={status.type === 'error' ? 'danger' : 'success'} onClose={() => setStatus({ type: '', message: '' })} dismissible>
-                    {status.message}
-                </Alert>
-            )}
 
             <Row className="justify-content-center">
                 <Col>

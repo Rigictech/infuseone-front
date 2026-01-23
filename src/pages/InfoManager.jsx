@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Container, Card, Button, Spinner, Alert } from 'react-bootstrap';
+import { Container, Card, Button, Spinner } from 'react-bootstrap';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -10,6 +10,7 @@ import {
     List, ListOrdered, Undo, Redo, Save
 } from 'lucide-react';
 import infoService from '../services/infoService';
+import toast from 'react-hot-toast';
 import '../styles/InfoManager.css';
 
 
@@ -124,7 +125,6 @@ const InfoManager = () => {
     const [infoId, setInfoId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [status, setStatus] = useState({ type: '', message: '' });
     const [, forceUpdate] = useState(0); // For toolbar updates
 
     // Role check
@@ -209,7 +209,6 @@ const InfoManager = () => {
 
         const content = editor.getHTML();
         setSaving(true);
-        setStatus({ type: '', message: '' });
 
         try {
             if (infoId) {
@@ -223,10 +222,10 @@ const InfoManager = () => {
                     setInfoId(response.data.data.id);
                 }
             }
-            setStatus({ type: 'success', message: 'Information saved successfully!' });
+            toast.success('Information saved successfully!');
         } catch (error) {
             console.error(error);
-            setStatus({ type: 'error', message: 'Failed to save information.' });
+            toast.error('Failed to save information.');
         } finally {
             setSaving(false);
         }
@@ -234,11 +233,6 @@ const InfoManager = () => {
 
     return (
         <Container fluid className="py-4" style={{ height: '85vh' }}>
-            {status.message && (
-                <Alert variant={status.type === 'error' ? 'danger' : 'success'} onClose={() => setStatus({ type: '', message: '' })} dismissible className="mb-3">
-                    {status.message}
-                </Alert>
-            )}
 
             <Card className="border-0 shadow-sm" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <Card.Header className="bg-white border-bottom py-3 d-flex justify-content-between align-items-center">

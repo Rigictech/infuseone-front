@@ -45,5 +45,7 @@ export default {
     updateProfile: (userData) => apiClient.post(`session/update-profile`, userData),
     updateProfileImage: (userData) => apiClient.post(`session/update-profile-image`, userData),
     showProfile: () => apiClient.post('session/profile'),
+    forgotPassword: (userData) => apiClient.post(`session/forgot-password`, userData),
+    resetPassword: (userData) => apiClient.post(`session/reset-password`, userData),
 
 };

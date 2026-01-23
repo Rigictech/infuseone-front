@@ -141,6 +141,12 @@ const Login = () => {
                         >
                             {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Login'}
                         </Button>
+
+                        <div className="d-flex justify-content-center mb-4">
+                            <Link to="/forgot-password" className="text-decoration-none small fw-medium" style={{ color: '#003366' }}>
+                                Forgot Password?
+                            </Link>
+                        </div>
                     </Form>
                 </Card.Body>
             </Card>
