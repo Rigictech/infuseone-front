@@ -6,6 +6,7 @@ import UrlModal from '../components/UrlModal';
 import Pagination from '../components/Pagination';
 import ConfirmationModal from '../components/ConfirmationModal';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const FormstackList = () => {
     const [urls, setUrls] = useState([]);
@@ -15,7 +16,7 @@ const FormstackList = () => {
 
     const role = localStorage.getItem('role');
     const isAdmin = role === 'Admin';
-
+    const navigate = useNavigate();
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
@@ -86,10 +87,11 @@ const FormstackList = () => {
     };
 
     const handleModalSubmit = async (data) => {
-        debugger
         try {
             if (editingUrl) {
+
                 const response = await formStackService.update(editingUrl.id, data);
+
                 if (response.data.status) {
                     toast.success(response.data.message || 'Formstack URL updated successfully');
                     navigate('/formstack-list');
