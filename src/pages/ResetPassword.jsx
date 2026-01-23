@@ -66,20 +66,20 @@ const ResetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // if (!email || !token) {
-        //     setError('Invalid reset link. Missing email or token.');
-        //     return;
-        // }
+        if (!email || !token) {
+            setError('Invalid reset link. Missing email or token.');
+            return;
+        }
 
-        // if (passwords.newPassword.length < 6) {
-        //     setError('Password must be at least 6 characters.');
-        //     return;
-        // }
+        if (passwords.newPassword.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
 
-        // if (passwords.newPassword !== passwords.confirmPassword) {
-        //     setError('Passwords do not match.');
-        //     return;
-        // }
+        if (passwords.newPassword !== passwords.confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
 
         setLoading(true);
         setError(null);
