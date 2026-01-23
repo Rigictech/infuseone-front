@@ -86,13 +86,26 @@ const FormstackList = () => {
     };
 
     const handleModalSubmit = async (data) => {
+        debugger
         try {
             if (editingUrl) {
                 await formStackService.update(editingUrl.id, data);
-                toast.success('Formstack URL updated successfully');
+                const response = await formStackService.update(editingUrl.id, data);
+                if (response.data.status) {
+                    toast.success(response.data.message || 'Formstack URL updated successfully');
+                    navigate('/formstack-list');
+                } else {
+                    toast.error(response.data.message || 'Failed to update URL.');
+                }
             } else {
                 await formStackService.store(data);
-                toast.success('Formstack URL added successfully');
+                const response = await formStackService.store(data);
+                if (response.data.status) {
+                    toast.success(response.data.message || 'Formstack URL added successfully');
+                    navigate('/formstack-list');
+                } else {
+                    toast.error(response.data.message || 'Failed to add URL.');
+                }
             }
             setShowModal(false);
             fetchUrls(currentPage);
