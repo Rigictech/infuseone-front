@@ -24,9 +24,12 @@ const AdminRoute = ({ children }) => {
   return role === 'Admin' ? children : <NotFound />;
 };
 
+import { Toaster } from "react-hot-toast";
+
 function App() {
   return (
     <UserProvider>
+      <Toaster position="top-right" />
       <BrowserRouter
         basename={import.meta.env.PROD ? "/infuseone-ghost-page" : "/"}
       >

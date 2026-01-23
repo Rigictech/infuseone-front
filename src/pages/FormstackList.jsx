@@ -4,6 +4,8 @@ import { Plus, Search, PenLine, Trash2 } from 'lucide-react';
 import formStackService from '../services/formStackService';
 import UrlModal from '../components/UrlModal';
 import Pagination from '../components/Pagination';
+import ConfirmationModal from '../components/ConfirmationModal';
+import toast from 'react-hot-toast';
 
 const FormstackList = () => {
     const [urls, setUrls] = useState([]);
@@ -22,7 +24,9 @@ const FormstackList = () => {
     const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingUrl, setEditingUrl] = useState(null);
+    const [urlToDelete, setUrlToDelete] = useState(null);
 
     useEffect(() => {
         fetchUrls(currentPage);
@@ -58,28 +62,38 @@ const FormstackList = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Delete this URL?')) {
-            try {
-                await formStackService.delete(id);
-                fetchUrls(currentPage);
-            } catch (err) {
-                alert('Failed to delete URL');
-            }
+    const handleDeleteClick = (url) => {
+        setUrlToDelete(url);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!urlToDelete) return;
+
+        try {
+            await formStackService.delete(urlToDelete.id);
+            toast.success('Formstack URL deleted successfully');
+            fetchUrls(currentPage);
+        } catch (err) {
+            toast.error('Failed to delete URL');
         }
+        setShowDeleteModal(false);
+        setUrlToDelete(null);
     };
 
     const handleModalSubmit = async (data) => {
         try {
             if (editingUrl) {
                 await formStackService.update(editingUrl.id, data);
+                toast.success('Formstack URL updated successfully');
             } else {
                 await formStackService.store(data);
+                toast.success('Formstack URL added successfully');
             }
             setShowModal(false);
             fetchUrls(currentPage);
         } catch (err) {
-            alert('Operation failed');
+            toast.error('Operation failed');
         }
     };
 
@@ -141,7 +155,7 @@ const FormstackList = () => {
                                         {isAdmin && (
                                             <td className="pe-4 text-center">
                                                 <Button variant="link" className="p-1 text-success me-2" onClick={() => handleEdit(url)}><PenLine size={18} /></Button>
-                                                <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(url.id)}><Trash2 size={18} /></Button>
+                                                <Button variant="link" className="p-1 text-danger" onClick={() => handleDeleteClick(url)}><Trash2 size={18} /></Button>
                                             </td>
                                         )}
                                     </tr>
@@ -172,6 +186,16 @@ const FormstackList = () => {
                 onSubmit={handleModalSubmit}
                 initialData={editingUrl}
                 title={editingUrl ? 'Edit Form' : 'Add New Form'}
+            />
+
+            <ConfirmationModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Form"
+                message="Are you sure you want to delete this form URL?"
+                confirmText="Delete"
+                confirmVariant="danger"
             />
         </Container>
     );

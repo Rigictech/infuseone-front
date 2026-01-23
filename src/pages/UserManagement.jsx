@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Table, Button, Form, InputGroup, Spinner, Alert } from 'react-bootstrap';
+import { Container, Card, Table, Button, Form, InputGroup, Spinner, Alert, Image } from 'react-bootstrap';
 import { Search, Plus, PenLine, Trash2 } from 'lucide-react';
 import userService from '../services/AdminUserService';
 import UserModal from '../components/UserModal';
 import Pagination from '../components/Pagination';
+import ConfirmationModal from '../components/ConfirmationModal';
+import toast from 'react-hot-toast';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -22,7 +24,9 @@ const UserManagement = () => {
     const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
+    const [userToDelete, setUserToDelete] = useState(null);
 
     useEffect(() => {
         fetchUsers();
@@ -79,16 +83,24 @@ const UserManagement = () => {
         setShowModal(true);
     };
 
-    const handleDeleteUser = async (id) => {
-        if (window.confirm('Are you sure you want to delete this user?')) {
-            try {
-                await userService.destroy(id);
-                fetchUsers();
-            } catch (err) {
-                console.error(err);
-                alert('Failed to delete user');
-            }
+    const handleDeleteClick = (user) => {
+        setUserToDelete(user);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!userToDelete) return;
+
+        try {
+            await userService.destroy(userToDelete.id);
+            toast.success('User deleted successfully');
+            fetchUsers();
+        } catch (err) {
+            console.error(err);
+            toast.error('Failed to delete user');
         }
+        setShowDeleteModal(false);
+        setUserToDelete(null);
     };
 
     const handleModalSubmit = async (userData, profileImage) => {
@@ -107,14 +119,16 @@ const UserManagement = () => {
 
             if (editingUser) {
                 await userService.update(editingUser.id, formData);
+                toast.success('User updated successfully');
             } else {
                 await userService.store(formData);
+                toast.success('User added successfully');
             }
             setShowModal(false);
             fetchUsers();
         } catch (err) {
             console.error(err);
-            alert('Operation failed');
+            toast.error('Operation failed');
         }
     };
 
@@ -146,7 +160,7 @@ const UserManagement = () => {
                                 placeholder="Search users..."
                                 className="bg-light border-0 rounded-end-pill"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={e => setSearchTerm(e.target.value)}
                             />
                         </InputGroup>
                         {isAdmin && (
@@ -207,8 +221,8 @@ const UserManagement = () => {
                                         {isAdmin && (
                                             <td className="pe-4 text-end">
                                                 <div className="d-flex justify-content-end gap-2">
-                                                    <Button variant="light" size="sm" className="text-success" onClick={() => handleEditUser(user)}><PenLine size={16} /></Button>
-                                                    <Button variant="light" size="sm" className="text-danger" onClick={() => handleDeleteUser(user.id)}><Trash2 size={16} /></Button>
+                                                    <Button variant="link" className="p-1 text-success" onClick={() => handleEditUser(user)}><PenLine size={18} /></Button>
+                                                    <Button variant="link" className="p-1 text-danger" onClick={() => handleDeleteClick(user)}><Trash2 size={18} /></Button>
                                                 </div>
                                             </td>
                                         )}
@@ -240,6 +254,16 @@ const UserManagement = () => {
                 onSubmit={handleModalSubmit}
                 user={editingUser}
                 title={editingUser ? 'Edit User' : 'Add New User'}
+            />
+
+            <ConfirmationModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Delete User"
+                message="Are you sure you want to delete this user?"
+                confirmText="Delete"
+                confirmVariant="danger"
             />
         </Container>
     );

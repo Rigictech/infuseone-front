@@ -4,6 +4,8 @@ import { Plus, Search, PenLine, Trash2 } from 'lucide-react';
 import webURLService from '../services/webURLService';
 import UrlModal from '../components/UrlModal';
 import Pagination from '../components/Pagination';
+import ConfirmationModal from '../components/ConfirmationModal';
+import toast from 'react-hot-toast';
 
 const WebsiteList = () => {
     const [urls, setUrls] = useState([]);
@@ -23,6 +25,8 @@ const WebsiteList = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [editingUrl, setEditingUrl] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [urlToDelete, setUrlToDelete] = useState(null);
 
     useEffect(() => {
         fetchUrls();
@@ -69,28 +73,38 @@ const WebsiteList = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Delete this Website URL?')) {
-            try {
-                await webURLService.delete(id);
-                fetchUrls();
-            } catch (err) {
-                alert('Failed to delete URL');
-            }
+    const handleDeleteClick = (url) => {
+        setUrlToDelete(url);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!urlToDelete) return;
+
+        try {
+            await webURLService.delete(urlToDelete.id);
+            toast.success('Website URL deleted successfully');
+            fetchUrls();
+        } catch (err) {
+            toast.error('Failed to delete URL');
         }
+        setShowDeleteModal(false);
+        setUrlToDelete(null);
     };
 
     const handleModalSubmit = async (data) => {
         try {
             if (editingUrl) {
                 await webURLService.update(editingUrl.id, data);
+                toast.success('Website URL updated successfully');
             } else {
                 await webURLService.store(data);
+                toast.success('Website URL added successfully');
             }
             setShowModal(false);
             fetchUrls();
         } catch (err) {
-            alert('Operation failed');
+            toast.error('Operation failed');
         }
     };
 
@@ -154,7 +168,7 @@ const WebsiteList = () => {
                                         {isAdmin && (
                                             <td className="pe-4 text-center">
                                                 <Button variant="link" className="p-1 text-success me-2" onClick={() => handleEdit(url)}><PenLine size={18} /></Button>
-                                                <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(url.id)}><Trash2 size={18} /></Button>
+                                                <Button variant="link" className="p-1 text-danger" onClick={() => handleDeleteClick(url)}><Trash2 size={18} /></Button>
                                             </td>
                                         )}
                                     </tr>
@@ -185,6 +199,16 @@ const WebsiteList = () => {
                 onSubmit={handleModalSubmit}
                 initialData={editingUrl}
                 title={editingUrl ? 'Edit Website' : 'Add New Website'}
+            />
+
+            <ConfirmationModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Website"
+                message="Are you sure you want to delete this website URL?"
+                confirmText="Delete"
+                confirmVariant="danger"
             />
         </Container>
     );

@@ -4,6 +4,8 @@ import { Plus, Search, PenLine, Trash2, Download, FileText } from 'lucide-react'
 import uploadService from '../services/uploadService';
 import UploadModal from '../components/UploadModal';
 import Pagination from '../components/Pagination';
+import ConfirmationModal from '../components/ConfirmationModal';
+import toast from 'react-hot-toast';
 
 const UploadsList = () => {
     const [uploads, setUploads] = useState([]);
@@ -22,7 +24,9 @@ const UploadsList = () => {
     const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingUpload, setEditingUpload] = useState(null);
+    const [uploadToDelete, setUploadToDelete] = useState(null);
 
     useEffect(() => {
         fetchUploads(currentPage);
@@ -41,7 +45,7 @@ const UploadsList = () => {
                 setStartIndex(responseData.meta.from);
                 setEndIndex(responseData.meta.to);
             } else {
-                // Fallback for safety if structure differs slightly in some cases, though 'upload_pdf' is expected
+                // Fallback for safety if structure differs slightly in some cases
                 const data = response.data;
                 let list = [];
                 if (Array.isArray(data)) {
@@ -70,30 +74,38 @@ const UploadsList = () => {
         setShowModal(true);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Delete this file?')) {
-            try {
-                await uploadService.delete(id);
-                fetchUploads(currentPage);
-            } catch (err) {
-                alert('Failed to delete upload');
-            }
-        }
+    const handleDeleteClick = (upload) => {
+        setUploadToDelete(upload);
+        setShowDeleteModal(true);
     };
 
+    const handleDeleteConfirm = async () => {
+        if (!uploadToDelete) return;
 
+        try {
+            await uploadService.delete(uploadToDelete.id);
+            toast.success('Upload deleted successfully');
+            fetchUploads(currentPage);
+        } catch (err) {
+            toast.error('Failed to delete upload');
+        }
+        setShowDeleteModal(false);
+        setUploadToDelete(null);
+    };
 
     const handleModalSubmit = async (formData) => {
         try {
             if (editingUpload) {
                 await uploadService.update(editingUpload.id, formData);
+                toast.success('Upload updated successfully');
             } else {
                 await uploadService.store(formData);
+                toast.success('Upload added successfully');
             }
             setShowModal(false);
             fetchUploads(currentPage);
         } catch (err) {
-            alert('Operation failed');
+            toast.error('Operation failed');
         }
     };
 
@@ -150,7 +162,6 @@ const UploadsList = () => {
                                     const baseUrl = import.meta.env.VITE_LARAVEL_IMAGE_URL || '';
                                     const rawPath = upload.pdf || '';
                                     // Ensure the path targets the 'pdfs' directory in storage
-                                    // Some records might return just the filename, others might have the folder
                                     const pdfPath = rawPath.startsWith('pdfs/') ? rawPath : `pdfs/${rawPath}`;
                                     const fullUrl = `${baseUrl}${pdfPath}`;
 
@@ -182,7 +193,7 @@ const UploadsList = () => {
                                                     {isAdmin && (
                                                         <>
                                                             <Button variant="link" className="p-1 text-success" onClick={() => handleEdit(upload)} title="Edit"><PenLine size={18} /></Button>
-                                                            <Button variant="link" className="p-1 text-danger" onClick={() => handleDelete(upload.id)} title="Delete"><Trash2 size={18} /></Button>
+                                                            <Button variant="link" className="p-1 text-danger" onClick={() => handleDeleteClick(upload)} title="Delete"><Trash2 size={18} /></Button>
                                                         </>
                                                     )}
                                                 </div>
@@ -215,6 +226,16 @@ const UploadsList = () => {
                 onHide={() => setShowModal(false)}
                 onSubmit={handleModalSubmit}
                 initialData={editingUpload}
+            />
+
+            <ConfirmationModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Upload"
+                message="Are you sure you want to delete this file?"
+                confirmText="Delete"
+                confirmVariant="danger"
             />
         </Container>
     );
