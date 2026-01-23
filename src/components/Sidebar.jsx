@@ -5,6 +5,7 @@ import { Nav, Image } from 'react-bootstrap';
 import '../styles/Sidebar.css';
 import userService from '../services/userService';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
+import toast from 'react-hot-toast';
 
 const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
     const location = useLocation();
@@ -39,6 +40,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
             navigate('/login');
         } catch (error) {
             console.error("Logout API error:", error);
+            toast.error(error.response?.data?.message || 'Logout failed');
             setLogoutLoading(false); // Only stop loading on error, otherwise we navigate away
             setShowLogoutModal(false);
         }

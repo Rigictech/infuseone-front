@@ -68,7 +68,7 @@ const UserManagement = () => {
             setError(null);
         } catch (err) {
             console.error(err);
-            setError('Failed to load users.');
+            setError(err.response?.data?.message || 'Failed to load users.');
         } finally {
             setLoading(false);
         }
@@ -101,7 +101,7 @@ const UserManagement = () => {
             setUserToDelete(null);
         } catch (err) {
             console.error(err);
-            toast.error('Failed to delete user');
+            toast.error(err.response?.data?.message || 'Failed to delete user');
         } finally {
             setDeleteLoading(false);
         }
@@ -132,7 +132,7 @@ const UserManagement = () => {
             fetchUsers();
         } catch (err) {
             console.error(err);
-            toast.error('Operation failed');
+            toast.error(err.response?.data?.message || 'Operation failed');
         }
     };
 

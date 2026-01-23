@@ -48,8 +48,11 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        // initial load for TopBar
-        refreshUser().catch(() => { });
+        // Only fetch profile if we have a token
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            refreshUser().catch(() => { });
+        }
     }, [refreshUser]);
 
     const updateUserAfterSuccess = useCallback((patch = {}) => {

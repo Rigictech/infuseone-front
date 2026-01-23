@@ -59,7 +59,7 @@ const UploadsList = () => {
                 setUploads(list);
             }
         } catch (err) {
-            setError('Failed to load uploads.');
+            setError(err.response?.data?.message || 'Failed to load uploads.');
         } finally {
             setLoading(false);
         }
@@ -91,7 +91,7 @@ const UploadsList = () => {
             setShowDeleteModal(false);
             setUploadToDelete(null);
         } catch (err) {
-            toast.error('Failed to delete upload');
+            toast.error(err.response?.data?.message || 'Failed to delete upload');
         } finally {
             setDeleteLoading(false);
         }
@@ -109,7 +109,7 @@ const UploadsList = () => {
             setShowModal(false);
             fetchUploads(currentPage);
         } catch (err) {
-            toast.error('Operation failed');
+            toast.error(err.response?.data?.message || 'Operation failed');
         }
     };
 

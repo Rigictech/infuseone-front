@@ -5,6 +5,7 @@ import { useUser } from '../context/UserContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import userService from '../services/userService';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
+import toast from 'react-hot-toast';
 
 const Topbar = ({ onMenuClick }) => {
     const { userProfile, getAvatarSrc } = useUser();
@@ -43,6 +44,7 @@ const Topbar = ({ onMenuClick }) => {
             navigate('/login');
         } catch (error) {
             console.error("Logout API error:", error);
+            toast.error(error.response?.data?.message || 'Logout failed');
             setLogoutLoading(false);
             setShowLogoutModal(false);
         }

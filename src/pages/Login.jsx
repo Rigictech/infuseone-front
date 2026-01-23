@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Container, Card, Form, Button, Row, Col, Alert, Spinner } from 'react-bootstrap';
+import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import userService from '../services/userService';
 import { useUser } from '../context/UserContext';
 
@@ -126,10 +126,10 @@ const Login = () => {
                                 >
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </div>
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.password}
-                                </Form.Control.Feedback>
                             </div>
+                            <Form.Control.Feedback type="invalid" style={{ display: errors.password ? 'block' : 'none' }}>
+                                {errors.password}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Button

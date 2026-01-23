@@ -47,7 +47,7 @@ const FormstackList = () => {
                 setEndIndex(responseData.meta.to);
             }
         } catch (err) {
-            setError('Failed to load Formstack URLs.');
+            setError(err.response?.data?.message || 'Failed to load Formstack URLs.');
         } finally {
             setLoading(false);
         }
@@ -79,7 +79,7 @@ const FormstackList = () => {
             setShowDeleteModal(false);
             setUrlToDelete(null);
         } catch (err) {
-            toast.error('Failed to delete URL');
+            toast.error(err.response?.data?.message || 'Failed to delete URL');
         } finally {
             setDeleteLoading(false);
         }
@@ -97,7 +97,7 @@ const FormstackList = () => {
             setShowModal(false);
             fetchUrls(currentPage);
         } catch (err) {
-            toast.error('Operation failed');
+            toast.error(err.response?.data?.message || 'Operation failed');
         }
     };
 

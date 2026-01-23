@@ -58,7 +58,7 @@ const WebsiteList = () => {
             setStartIndex(meta.from || 1);
             setEndIndex(meta.to || list.length);
         } catch (err) {
-            setError('Failed to load Website URLs.');
+            setError(err.response?.data?.message || 'Failed to load Website URLs.');
         } finally {
             setLoading(false);
         }
@@ -90,7 +90,7 @@ const WebsiteList = () => {
             setShowDeleteModal(false);
             setUrlToDelete(null);
         } catch (err) {
-            toast.error('Failed to delete URL');
+            toast.error(err.response?.data?.message || 'Failed to delete URL');
         } finally {
             setDeleteLoading(false);
         }
@@ -108,7 +108,7 @@ const WebsiteList = () => {
             setShowModal(false);
             fetchUrls();
         } catch (err) {
-            toast.error('Operation failed');
+            toast.error(err.response?.data?.message || 'Operation failed');
         }
     };
 

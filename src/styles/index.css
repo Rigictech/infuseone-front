@@ -1,16 +1,25 @@
 /* Global Variables */
 :root {
   /* Colors */
-  --primary-color: #4f46e5; /* Indigo 600 */
-  --primary-hover: #4338ca; /* Indigo 700 */
-  --secondary-color: #64748b; /* Slate 500 */
-  --background-bg: #f8fafc; /* Slate 50 */
+  --primary-color: #4f46e5;
+  /* Indigo 600 */
+  --primary-hover: #4338ca;
+  /* Indigo 700 */
+  --secondary-color: #64748b;
+  /* Slate 500 */
+  --background-bg: #f8fafc;
+  /* Slate 50 */
   --surface-bg: #ffffff;
-  --text-main: #1e293b; /* Slate 800 */
-  --text-secondary: #64748b; /* Slate 500 */
-  --border-color: #e2e8f0; /* Slate 200 */
-  --danger-color: #ef4444; /* Red 500 */
-  --success-color: #22c55e; /* Green 500 */
+  --text-main: #1e293b;
+  /* Slate 800 */
+  --text-secondary: #64748b;
+  /* Slate 500 */
+  --border-color: #e2e8f0;
+  /* Slate 200 */
+  --danger-color: #ef4444;
+  /* Red 500 */
+  --success-color: #22c55e;
+  /* Green 500 */
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -62,7 +71,9 @@ button {
   font-family: inherit;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -130,13 +141,48 @@ input, select, textarea {
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-.text-center { text-align: center; }
-.text-sm { font-size: 0.875rem; }
-.text-muted { color: var(--text-secondary); }
-.mt-4 { margin-top: var(--spacing-md); }
-.mb-4 { margin-bottom: var(--spacing-md); }
-.flex { display: flex; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.justify-center { justify-content: center; }
-.gap-2 { gap: var(--spacing-sm); }
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.mt-4 {
+  margin-top: var(--spacing-md);
+}
+
+.mb-4 {
+  margin-bottom: var(--spacing-md);
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: var(--spacing-sm);
+}
+
+/* Remove Bootstrap validation icon */
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+  background-image: none !important;
+}
