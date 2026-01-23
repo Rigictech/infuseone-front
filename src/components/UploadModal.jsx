@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, Button, Form, Alert } from 'react-bootstrap';
+import { Modal, Button, Form, Alert, Spinner } from 'react-bootstrap';
 
 const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
     const [title, setTitle] = useState('');
     const [file, setFile] = useState(null);
     const [error, setError] = useState(null);
     const [validated, setValidated] = useState(false);
+    const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -18,6 +19,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
         }
         setError(null);
         setValidated(false);
+        setLoading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
     }, [initialData, show]);
 
@@ -41,7 +43,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
 
@@ -63,7 +65,14 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
             formData.append('pdf', file);
         }
 
-        onSubmit(formData);
+        setLoading(true);
+        try {
+            await onSubmit(formData);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -114,8 +123,9 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                     type="submit"
                     form="uploadForm"
                     style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                    disabled={loading}
                 >
-                    {initialData ? 'Save Changes' : 'Upload'}
+                    {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : (initialData ? 'Save Changes' : 'Upload')}
                 </Button>
             </Modal.Footer>
         </Modal>

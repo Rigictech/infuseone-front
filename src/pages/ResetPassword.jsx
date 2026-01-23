@@ -66,35 +66,44 @@ const ResetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!email || !token) {
-            setError('Invalid reset link. Missing email or token.');
-            return;
-        }
+        // if (!email || !token) {
+        //     setError('Invalid reset link. Missing email or token.');
+        //     return;
+        // }
 
-        if (passwords.newPassword.length < 6) {
-            setError('Password must be at least 6 characters.');
-            return;
-        }
+        // if (passwords.newPassword.length < 6) {
+        //     setError('Password must be at least 6 characters.');
+        //     return;
+        // }
 
-        if (passwords.newPassword !== passwords.confirmPassword) {
-            setError('Passwords do not match.');
-            return;
-        }
+        // if (passwords.newPassword !== passwords.confirmPassword) {
+        //     setError('Passwords do not match.');
+        //     return;
+        // }
 
         setLoading(true);
         setError(null);
 
         try {
-            await userService.resetPassword({
+            debugger
+            const response = await userService.resetPassword({
                 email,
                 token,
                 password: passwords.newPassword,
                 password_confirmation: passwords.confirmPassword
             });
-            toast.success('Password reset successfully! You can now login.');
-            navigate('/login');
+
+            if (response.data.status) {
+                toast.success(response.data.message || 'Password reset successfully! You can now login.');
+                navigate('/login');
+            } else {
+                toast.error(response.data.message || 'Failed to reset password.');
+            }
+
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to reset password. Link may be expired.');
+            console.error(err);
+            const errorMessage = err.response?.data?.message || err.message || 'Failed to reset password. Link may be expired.';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

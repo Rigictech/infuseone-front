@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 
 const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
     const [formData, setFormData] = useState({ title: '', URL: '' });
     const [validated, setValidated] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (initialData) {
@@ -15,6 +16,7 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
             setFormData({ title: '', URL: '' });
         }
         setValidated(false);
+        setLoading(false);
     }, [initialData, show]);
 
     const handleChange = (e) => {
@@ -22,13 +24,22 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
         if (form.checkValidity() === false) {
             e.stopPropagation();
-        } else {
-            onSubmit(formData);
+            setValidated(true);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            await onSubmit(formData);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
         setValidated(true);
     };
@@ -73,8 +84,9 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
                     type="submit"
                     form="urlForm"
                     style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                    disabled={loading}
                 >
-                    Save
+                    {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Save'}
                 </Button>
             </Modal.Footer>
         </Modal>

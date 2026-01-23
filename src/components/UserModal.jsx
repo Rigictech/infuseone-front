@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Spinner } from 'react-bootstrap';
 
 const UserModal = ({ show, onHide, onSubmit, user, title }) => {
     const [formData, setFormData] = useState({
@@ -7,6 +7,7 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
         email: '',
     });
     const [validated, setValidated] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -21,6 +22,7 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
             });
         }
         setValidated(false);
+        setLoading(false);
     }, [user, show]);
 
     const handleChange = (e) => {
@@ -41,7 +43,7 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
         return newPassword;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
         if (form.checkValidity() === false) {
@@ -55,7 +57,14 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
             dataToSubmit.password = generatePassword();
         }
 
-        onSubmit(dataToSubmit);
+        setLoading(true);
+        try {
+            await onSubmit(dataToSubmit);
+        } catch (error) {
+            console.error("Error submitting form", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -113,8 +122,9 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
                     type="submit"
                     form="userForm"
                     style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                    disabled={loading}
                 >
-                    {user ? 'Save Changes' : 'Create User'}
+                    {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : (user ? 'Save Changes' : 'Create User')}
                 </Button>
             </Modal.Footer>
         </Modal>
