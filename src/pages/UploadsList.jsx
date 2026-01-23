@@ -16,31 +16,43 @@ const UploadsList = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
     const [editingUpload, setEditingUpload] = useState(null);
 
     useEffect(() => {
-        fetchUploads();
-    }, []);
+        fetchUploads(currentPage);
+    }, [currentPage]);
 
-    const fetchUploads = async () => {
+    const fetchUploads = async (page = 1) => {
         try {
             setLoading(true);
-            const response = await uploadService.index();
-            const data = response.data;
-            let list = [];
-            if (Array.isArray(data)) {
-                list = data;
-            } else if (data.data && Array.isArray(data.data)) {
-                list = data.data;
-            } else if (data.upload_pdf && data.upload_pdf.data) {
-                list = data.upload_pdf.data;
+            const response = await uploadService.index(page);
+            const responseData = response?.data?.upload_pdf;
+
+            if (responseData) {
+                setUploads(Array.isArray(responseData.data) ? responseData.data : []);
+                setTotalPages(responseData.meta.last_page);
+                setTotalRecords(responseData.meta.total);
+                setStartIndex(responseData.meta.from);
+                setEndIndex(responseData.meta.to);
             } else {
-                list = data.data || [];
+                // Fallback for safety if structure differs slightly in some cases, though 'upload_pdf' is expected
+                const data = response.data;
+                let list = [];
+                if (Array.isArray(data)) {
+                    list = data;
+                } else if (data.data && Array.isArray(data.data)) {
+                    list = data.data;
+                } else {
+                    list = data.data || [];
+                }
+                setUploads(list);
             }
-            setUploads(list);
         } catch (err) {
             setError('Failed to load uploads.');
         } finally {
@@ -62,7 +74,7 @@ const UploadsList = () => {
         if (window.confirm('Delete this file?')) {
             try {
                 await uploadService.delete(id);
-                fetchUploads();
+                fetchUploads(currentPage);
             } catch (err) {
                 alert('Failed to delete upload');
             }
@@ -79,26 +91,18 @@ const UploadsList = () => {
                 await uploadService.store(formData);
             }
             setShowModal(false);
-            fetchUploads();
+            fetchUploads(currentPage);
         } catch (err) {
             alert('Operation failed');
         }
     };
 
-    // Filter Logic
+    // Filter Logic - Applied to the current page
     const filteredUploads = uploads.filter(u => (u.name || u.title || '').toLowerCase().includes(searchTerm.toLowerCase()));
-
-    // Pagination Logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredUploads.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredUploads.length / itemsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
+    // Initial load handled by first use effect
 
     return (
         <Container fluid className="py-4">
@@ -141,8 +145,8 @@ const UploadsList = () => {
                         <tbody>
                             {loading ? (
                                 <tr><td colSpan="3" className="text-center py-5"><Spinner animation="border" variant="primary" /></td></tr>
-                            ) : currentItems.length > 0 ? (
-                                currentItems.map(upload => {
+                            ) : filteredUploads.length > 0 ? (
+                                filteredUploads.map(upload => {
                                     const baseUrl = import.meta.env.VITE_LARAVEL_IMAGE_URL || '';
                                     const rawPath = upload.pdf || '';
                                     // Ensure the path targets the 'pdfs' directory in storage
@@ -193,14 +197,14 @@ const UploadsList = () => {
                     </Table>
                 </Card.Body>
                 <Card.Footer className="bg-white border-top-0">
-                    {!loading && filteredUploads.length > 0 && (
+                    {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={paginate}
-                            totalRecords={filteredUploads.length}
-                            startIndex={indexOfFirstItem + 1}
-                            endIndex={Math.min(indexOfLastItem, filteredUploads.length)}
+                            totalRecords={totalRecords}
+                            startIndex={startIndex}
+                            endIndex={endIndex}
                         />
                     )}
                 </Card.Footer>

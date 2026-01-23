@@ -98,11 +98,8 @@
   flex: 1;
   padding: 20px 0;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  scrollbar-width: none;
-  /* Hide scrollbar */
+  display: block;
+  scrollbar-width: thin;
 }
 
 .nav-link {

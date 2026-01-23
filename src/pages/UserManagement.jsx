@@ -32,7 +32,7 @@ const UserManagement = () => {
         try {
             setLoading(true);
             const response = await userService.index(currentPage);
-            const data = response.data;
+            const data = response?.data;
 
             let userList = [];
             let meta = {};

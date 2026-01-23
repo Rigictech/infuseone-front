@@ -16,22 +16,31 @@ const FormstackList = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
 
     const [showModal, setShowModal] = useState(false);
     const [editingUrl, setEditingUrl] = useState(null);
 
     useEffect(() => {
-        fetchUrls();
-    }, []);
+        fetchUrls(currentPage);
+    }, [currentPage]);
 
-    const fetchUrls = async () => {
+    const fetchUrls = async (page = 1) => {
         try {
             setLoading(true);
-            const response = await formStackService.index();
-            const data = response.data.form_stack_url.data;
-            // Handle Laravel resource or direct array
-            setUrls(Array.isArray(data) ? data : (data.data || []));
+            const response = await formStackService.index(page);
+            const responseData = response?.data?.form_stack_url;
+
+            if (responseData) {
+                setUrls(Array.isArray(responseData.data) ? responseData.data : []);
+                setTotalPages(responseData.meta.last_page);
+                setTotalRecords(responseData.meta.total);
+                setStartIndex(responseData.meta.from);
+                setEndIndex(responseData.meta.to);
+            }
         } catch (err) {
             setError('Failed to load Formstack URLs.');
         } finally {
@@ -53,7 +62,7 @@ const FormstackList = () => {
         if (window.confirm('Delete this URL?')) {
             try {
                 await formStackService.delete(id);
-                fetchUrls();
+                fetchUrls(currentPage);
             } catch (err) {
                 alert('Failed to delete URL');
             }
@@ -68,28 +77,20 @@ const FormstackList = () => {
                 await formStackService.store(data);
             }
             setShowModal(false);
-            fetchUrls();
+            fetchUrls(currentPage);
         } catch (err) {
             alert('Operation failed');
         }
     };
 
-    // Filter Logic
+    // Filter Logic - Applied to the currently fetched page
     const filteredUrls = Array.isArray(urls)
         ? urls.filter(u => (u.title || u.name || '').toLowerCase().includes(searchTerm.toLowerCase()))
         : [];
 
-    // Pagination Logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredUrls.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredUrls.length / itemsPerPage);
-
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
+    // Initial load handled by first use effect on currentPage change
 
     return (
         <Container fluid className="py-4">
@@ -132,8 +133,8 @@ const FormstackList = () => {
                         <tbody>
                             {loading ? (
                                 <tr><td colSpan="3" className="text-center py-5"><Spinner animation="border" variant="primary" /></td></tr>
-                            ) : currentItems.length > 0 ? (
-                                currentItems.map(url => (
+                            ) : filteredUrls.length > 0 ? (
+                                filteredUrls.map(url => (
                                     <tr key={url.id}>
                                         <td className="ps-4 fw-medium">{url.title || url.name}</td>
                                         <td><a href={url.url || url.URL} target="_blank" rel="noopener noreferrer" className="text-decoration-none">{url.url || url.URL}</a></td>
@@ -152,14 +153,14 @@ const FormstackList = () => {
                     </Table>
                 </Card.Body>
                 <Card.Footer className="bg-white border-top-0">
-                    {!loading && filteredUrls.length > 0 && (
+                    {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={paginate}
-                            totalRecords={filteredUrls.length}
-                            startIndex={indexOfFirstItem + 1}
-                            endIndex={Math.min(indexOfLastItem, filteredUrls.length)}
+                            totalRecords={totalRecords}
+                            startIndex={startIndex}
+                            endIndex={endIndex}
                         />
                     )}
                 </Card.Footer>
