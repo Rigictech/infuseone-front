@@ -60,6 +60,7 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
                             placeholder="Enter title"
                             value={formData.title}
                             onChange={handleChange}
+                            maxLength={25}
                         />
                         <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
                     </Form.Group>

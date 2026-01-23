@@ -207,6 +207,11 @@ const InfoManager = () => {
     const handleSave = async () => {
         if (!editor) return;
 
+        if (editor.isEmpty) {
+            toast.error('Content cannot be empty.');
+            return;
+        }
+
         const content = editor.getHTML();
         setSaving(true);
 

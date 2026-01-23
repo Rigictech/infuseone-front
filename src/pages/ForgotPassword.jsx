@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Alert, Spinner } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import userService from '../services/userService';
 import toast from 'react-hot-toast';
 
@@ -8,6 +8,7 @@ const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,8 +21,13 @@ const ForgotPassword = () => {
         setError(null);
 
         try {
-            await userService.forgotPassword({ email });
-            toast.success('Password reset link sent to your email!');
+            const response = await userService.forgotPassword({ email });
+            if (response.data.status) {
+                toast.success(response.data.message || 'Password reset successfully! You can now login.');
+                navigate('/login');
+            } else {
+                toast.error(response.data.message || 'Failed to reset password.');
+            }
             setEmail('');
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to send reset link. Please try again.');

@@ -150,7 +150,7 @@ const UserManagement = () => {
     }, [searchTerm]);
 
     return (
-        <Container className="py-4">
+        <Container fluid className="py-4">
             {error && <Alert variant="danger">{error}</Alert>}
 
             <Card className="border-0 shadow-sm">

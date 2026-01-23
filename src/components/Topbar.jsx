@@ -60,7 +60,7 @@ const Topbar = ({ onMenuClick }) => {
                         </Button>
                     </div>
 
-                    <Navbar.Brand className="fw-bold text-primary d-none d-md-block">
+                    <Navbar.Brand className="fw-bold d-none d-md-block" style={{ color: '#003366' }}>
                         {getPageTitle(location.pathname)}
                     </Navbar.Brand>
 

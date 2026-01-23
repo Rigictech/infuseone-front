@@ -89,7 +89,6 @@ const FormstackList = () => {
         debugger
         try {
             if (editingUrl) {
-                await formStackService.update(editingUrl.id, data);
                 const response = await formStackService.update(editingUrl.id, data);
                 if (response.data.status) {
                     toast.success(response.data.message || 'Formstack URL updated successfully');
@@ -98,7 +97,6 @@ const FormstackList = () => {
                     toast.error(response.data.message || 'Failed to update URL.');
                 }
             } else {
-                await formStackService.store(data);
                 const response = await formStackService.store(data);
                 if (response.data.status) {
                     toast.success(response.data.message || 'Formstack URL added successfully');

@@ -20,6 +20,8 @@ const Profile = () => {
     const [loading, setLoading] = useState(false);
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [loadingPassword, setLoadingPassword] = useState(false);
+    const [validatedProfile, setValidatedProfile] = useState(false);
+    const [validatedPassword, setValidatedPassword] = useState(false);
     const [showPassword, setShowPassword] = useState({
         current: false,
         new: false
@@ -81,6 +83,13 @@ const Profile = () => {
     // Email Update
     const handleEmailUpdate = async (e) => {
         e.preventDefault();
+        const form = e.currentTarget;
+        if (form.checkValidity() === false) {
+            e.stopPropagation();
+            setValidatedProfile(true);
+            return;
+        }
+
         setLoadingProfile(true);
 
         try {
@@ -104,10 +113,13 @@ const Profile = () => {
     // Password Update
     const handlePasswordUpdate = async (e) => {
         e.preventDefault();
-        if (!passwords.currentPassword || !passwords.newPassword) {
-            toast.error('Please fill in all password fields.');
+        const form = e.currentTarget;
+        if (form.checkValidity() === false) {
+            e.stopPropagation();
+            setValidatedPassword(true);
             return;
         }
+
         if (passwords.newPassword.length < 6) {
             toast.error('New password must be at least 6 characters.');
             return;
@@ -214,7 +226,7 @@ const Profile = () => {
                     <Card className="border-0 shadow-sm mb-4">
                         <Card.Body>
                             <h6 className="fw-bold mb-3 text-primary">Update Profile</h6>
-                            <Form onSubmit={handleEmailUpdate}>
+                            <Form noValidate validated={validatedProfile} onSubmit={handleEmailUpdate}>
                                 <Form.Group className="mb-3" controlId="name">
                                     <Form.Label className="fw-medium small">Name</Form.Label>
                                     <Form.Control
@@ -224,6 +236,9 @@ const Profile = () => {
                                         onChange={(e) => setName(e.target.value)}
                                         required
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        Name is required.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId="email">
                                     <Form.Label className="fw-medium small">Email</Form.Label>
@@ -234,6 +249,9 @@ const Profile = () => {
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
                                     />
+                                    <Form.Control.Feedback type="invalid">
+                                        Please enter a valid email.
+                                    </Form.Control.Feedback>
                                 </Form.Group>
                                 <div className="text-end">
                                     <Button
@@ -253,7 +271,7 @@ const Profile = () => {
                     <Card className="border-0 shadow-sm">
                         <Card.Body>
                             <h6 className="fw-bold mb-3 text-primary">Change Password</h6>
-                            <Form onSubmit={handlePasswordUpdate}>
+                            <Form noValidate validated={validatedPassword} onSubmit={handlePasswordUpdate}>
                                 <Form.Group className="mb-3" controlId="currentPassword">
                                     <Form.Label className="fw-medium small">Current Password</Form.Label>
                                     <div className="position-relative">
@@ -264,13 +282,16 @@ const Profile = () => {
                                             onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
                                             required
                                         />
-                                        <div className="position-absolute top-50 end-0 translate-middle-y pe-3 d-flex gap-3 align-items-center text-secondary"
+                                        <div className="position-absolute top-0 end-0 pe-3 d-flex gap-3 align-items-center text-secondary"
                                             onClick={() => setShowPassword({ ...showPassword, current: !showPassword.current })}
-                                            style={{ cursor: 'pointer' }}
+                                            style={{ cursor: 'pointer', height: '38px' }}
                                             title={showPassword.current ? "Hide" : "Show"}
                                         >
                                             {showPassword.current ? <EyeOff size={18} /> : <Eye size={18} />}
                                         </div>
+                                        <Form.Control.Feedback type="invalid">
+                                            Current password is required.
+                                        </Form.Control.Feedback>
                                     </div>
                                 </Form.Group>
 
@@ -285,7 +306,8 @@ const Profile = () => {
                                             required
                                             style={{ paddingRight: '120px' }}
                                         />
-                                        <div className="position-absolute top-50 end-0 translate-middle-y pe-3 d-flex gap-3 align-items-center text-secondary"
+                                        <div className="position-absolute top-0 end-0 pe-3 d-flex gap-3 align-items-center text-secondary"
+                                            style={{ height: '38px' }}
                                         >
                                             <WandSparkles
                                                 size={18}
@@ -308,6 +330,9 @@ const Profile = () => {
                                                 {showPassword.new ? <EyeOff size={18} /> : <Eye size={18} />}
                                             </div>
                                         </div>
+                                        <Form.Control.Feedback type="invalid">
+                                            New password is required.
+                                        </Form.Control.Feedback>
                                     </div>
                                 </Form.Group>
                                 <div className="text-end">
