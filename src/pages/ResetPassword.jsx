@@ -85,7 +85,6 @@ const ResetPassword = () => {
         setError(null);
 
         try {
-            debugger
             const response = await userService.resetPassword({
                 email,
                 token,

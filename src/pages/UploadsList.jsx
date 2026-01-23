@@ -27,6 +27,7 @@ const UploadsList = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingUpload, setEditingUpload] = useState(null);
     const [uploadToDelete, setUploadToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         fetchUploads(currentPage);
@@ -82,15 +83,18 @@ const UploadsList = () => {
     const handleDeleteConfirm = async () => {
         if (!uploadToDelete) return;
 
+        setDeleteLoading(true);
         try {
             await uploadService.delete(uploadToDelete.id);
             toast.success('Upload deleted successfully');
             fetchUploads(currentPage);
+            setShowDeleteModal(false);
+            setUploadToDelete(null);
         } catch (err) {
             toast.error('Failed to delete upload');
+        } finally {
+            setDeleteLoading(false);
         }
-        setShowDeleteModal(false);
-        setUploadToDelete(null);
     };
 
     const handleModalSubmit = async (formData) => {
@@ -236,6 +240,7 @@ const UploadsList = () => {
                 message="Are you sure you want to delete this file?"
                 confirmText="Delete"
                 confirmVariant="danger"
+                loading={deleteLoading}
             />
         </Container>
     );

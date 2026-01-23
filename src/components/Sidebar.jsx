@@ -23,12 +23,14 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
     ].filter(item => isAdmin || !item.adminOnly);
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [logoutLoading, setLogoutLoading] = useState(false);
 
     const handleLogoutClick = () => {
         setShowLogoutModal(true);
     };
 
     const handleLogoutConfirm = async () => {
+        setLogoutLoading(true);
         try {
             await userService.logout();
             localStorage.removeItem('authToken');
@@ -37,8 +39,9 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
             navigate('/login');
         } catch (error) {
             console.error("Logout API error:", error);
-        };
-        setShowLogoutModal(false);
+            setLogoutLoading(false); // Only stop loading on error, otherwise we navigate away
+            setShowLogoutModal(false);
+        }
     }
 
     return (
@@ -91,6 +94,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
                 show={showLogoutModal}
                 onHide={() => setShowLogoutModal(false)}
                 onConfirm={handleLogoutConfirm}
+                loading={logoutLoading}
             />
         </>
     );

@@ -16,7 +16,6 @@ import { UserProvider } from "./context/UserContext";
 
 
 const RootRedirect = () => {
-  debugger
   const role = localStorage.getItem('role');
   return role === 'Admin' ? <Navigate to="users-list" replace /> : <Navigate to="formstack-list" replace />;
 };

@@ -27,12 +27,14 @@ const Topbar = ({ onMenuClick }) => {
     };
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [logoutLoading, setLogoutLoading] = useState(false);
 
     const handleLogoutClick = () => {
         setShowLogoutModal(true);
     };
 
     const handleLogoutConfirm = async () => {
+        setLogoutLoading(true);
         try {
             await userService.logout();
             localStorage.removeItem('authToken');
@@ -41,8 +43,9 @@ const Topbar = ({ onMenuClick }) => {
             navigate('/login');
         } catch (error) {
             console.error("Logout API error:", error);
+            setLogoutLoading(false);
+            setShowLogoutModal(false);
         }
-        setShowLogoutModal(false);
     };
 
     return (
@@ -116,6 +119,7 @@ const Topbar = ({ onMenuClick }) => {
                 show={showLogoutModal}
                 onHide={() => setShowLogoutModal(false)}
                 onConfirm={handleLogoutConfirm}
+                loading={logoutLoading}
             />
         </>
     );

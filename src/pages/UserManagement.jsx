@@ -27,6 +27,7 @@ const UserManagement = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         fetchUsers();
@@ -91,16 +92,19 @@ const UserManagement = () => {
     const handleDeleteConfirm = async () => {
         if (!userToDelete) return;
 
+        setDeleteLoading(true);
         try {
             await userService.destroy(userToDelete.id);
             toast.success('User deleted successfully');
             fetchUsers();
+            setShowDeleteModal(false);
+            setUserToDelete(null);
         } catch (err) {
             console.error(err);
             toast.error('Failed to delete user');
+        } finally {
+            setDeleteLoading(false);
         }
-        setShowDeleteModal(false);
-        setUserToDelete(null);
     };
 
     const handleModalSubmit = async (userData, profileImage) => {
@@ -264,6 +268,7 @@ const UserManagement = () => {
                 message="Are you sure you want to delete this user?"
                 confirmText="Delete"
                 confirmVariant="danger"
+                loading={deleteLoading}
             />
         </Container>
     );

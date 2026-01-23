@@ -27,6 +27,7 @@ const FormstackList = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [editingUrl, setEditingUrl] = useState(null);
     const [urlToDelete, setUrlToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         fetchUrls(currentPage);
@@ -70,15 +71,18 @@ const FormstackList = () => {
     const handleDeleteConfirm = async () => {
         if (!urlToDelete) return;
 
+        setDeleteLoading(true);
         try {
             await formStackService.delete(urlToDelete.id);
             toast.success('Formstack URL deleted successfully');
             fetchUrls(currentPage);
+            setShowDeleteModal(false);
+            setUrlToDelete(null);
         } catch (err) {
             toast.error('Failed to delete URL');
+        } finally {
+            setDeleteLoading(false);
         }
-        setShowDeleteModal(false);
-        setUrlToDelete(null);
     };
 
     const handleModalSubmit = async (data) => {
@@ -185,7 +189,7 @@ const FormstackList = () => {
                 onHide={() => setShowModal(false)}
                 onSubmit={handleModalSubmit}
                 initialData={editingUrl}
-                title={editingUrl ? 'Edit Form' : 'Add New Form'}
+                title={editingUrl ? 'Edit Formstack' : 'Add New Formstack'}
             />
 
             <ConfirmationModal
@@ -196,6 +200,7 @@ const FormstackList = () => {
                 message="Are you sure you want to delete this form URL?"
                 confirmText="Delete"
                 confirmVariant="danger"
+                loading={deleteLoading}
             />
         </Container>
     );

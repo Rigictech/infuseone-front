@@ -78,7 +78,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
     return (
         <Modal show={show} onHide={onHide} centered backdrop="static">
             <Modal.Header closeButton className="border-0">
-                <Modal.Title className="fw-bold">{initialData ? 'Edit Upload' : 'New Upload'}</Modal.Title>
+                <Modal.Title className="fw-bold">{initialData ? 'Edit Upload' : 'Add New Upload'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {error && <Alert variant="danger" className="py-2 text-center small">{error}</Alert>}

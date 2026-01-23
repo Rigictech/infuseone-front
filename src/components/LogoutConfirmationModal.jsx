@@ -1,8 +1,8 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { LogOut, AlertTriangle } from 'lucide-react';
+import { Modal, Button, Spinner } from 'react-bootstrap';
+import { LogOut } from 'lucide-react';
 
-const LogoutConfirmationModal = ({ show, onHide, onConfirm }) => {
+const LogoutConfirmationModal = ({ show, onHide, onConfirm, loading = false }) => {
     return (
         <Modal
             show={show}
@@ -27,6 +27,7 @@ const LogoutConfirmationModal = ({ show, onHide, onConfirm }) => {
                     variant="light"
                     onClick={onHide}
                     className="px-4 fw-medium"
+                    disabled={loading}
                 >
                     Cancel
                 </Button>
@@ -35,9 +36,14 @@ const LogoutConfirmationModal = ({ show, onHide, onConfirm }) => {
                     onClick={onConfirm}
                     className="px-4 fw-medium d-flex align-items-center"
                     style={{ backgroundColor: '#dc3545', borderColor: '#dc3545' }}
+                    disabled={loading}
                 >
-                    <LogOut size={18} className="me-2" />
-                    Logout
+                    {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : (
+                        <>
+                            <LogOut size={18} className="me-2" />
+                            Logout
+                        </>
+                    )}
                 </Button>
             </Modal.Footer>
         </Modal>

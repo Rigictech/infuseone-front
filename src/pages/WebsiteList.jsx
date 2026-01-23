@@ -27,6 +27,7 @@ const WebsiteList = () => {
     const [editingUrl, setEditingUrl] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [urlToDelete, setUrlToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         fetchUrls();
@@ -81,15 +82,18 @@ const WebsiteList = () => {
     const handleDeleteConfirm = async () => {
         if (!urlToDelete) return;
 
+        setDeleteLoading(true);
         try {
             await webURLService.delete(urlToDelete.id);
             toast.success('Website URL deleted successfully');
             fetchUrls();
+            setShowDeleteModal(false);
+            setUrlToDelete(null);
         } catch (err) {
             toast.error('Failed to delete URL');
+        } finally {
+            setDeleteLoading(false);
         }
-        setShowDeleteModal(false);
-        setUrlToDelete(null);
     };
 
     const handleModalSubmit = async (data) => {
@@ -209,6 +213,7 @@ const WebsiteList = () => {
                 message="Are you sure you want to delete this website URL?"
                 confirmText="Delete"
                 confirmVariant="danger"
+                loading={deleteLoading}
             />
         </Container>
     );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import { AlertTriangle } from 'lucide-react';
 
 const ConfirmationModal = ({
@@ -10,7 +10,8 @@ const ConfirmationModal = ({
     message = "Are you sure you want to proceed?",
     confirmText = "Confirm",
     confirmVariant = "danger",
-    icon: Icon = AlertTriangle
+    icon: Icon = AlertTriangle,
+    loading = false
 }) => {
     return (
         <Modal
@@ -37,6 +38,7 @@ const ConfirmationModal = ({
                     variant="light"
                     onClick={onHide}
                     className="px-4 fw-medium"
+                    disabled={loading}
                 >
                     Cancel
                 </Button>
@@ -45,8 +47,9 @@ const ConfirmationModal = ({
                     onClick={onConfirm}
                     className="px-4 fw-medium d-flex align-items-center"
                     style={confirmVariant === 'danger' ? { backgroundColor: '#dc3545', borderColor: '#dc3545' } : {}}
+                    disabled={loading}
                 >
-                    {confirmText}
+                    {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : confirmText}
                 </Button>
             </Modal.Footer>
         </Modal>
