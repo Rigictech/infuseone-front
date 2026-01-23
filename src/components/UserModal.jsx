@@ -86,7 +86,7 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     autoComplete="off"
-                                    maxLength={25}
+                                    maxLength={50}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     Name is required.

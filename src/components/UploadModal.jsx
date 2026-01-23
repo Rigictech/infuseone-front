@@ -91,7 +91,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                             placeholder="e.g., Annual Report"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            maxLength={25}
+                            maxLength={50}
                         />
                         <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
                     </Form.Group>
