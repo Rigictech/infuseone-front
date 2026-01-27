@@ -78,7 +78,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
     return (
         <Modal show={show} onHide={onHide} centered backdrop="static">
             <Modal.Header closeButton className="border-0">
-                <Modal.Title className="fw-bold">{initialData ? 'Edit Upload' : 'Add New Upload'}</Modal.Title>
+                <Modal.Title className="fw-bold">{initialData ? 'Edit File' : 'Add New File'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {error && <Alert variant="danger" className="py-2 text-center small">{error}</Alert>}
@@ -91,9 +91,10 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                             placeholder="e.g., Annual Report"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            maxLength={50}
+                            maxLength={100}
+                            isInvalid={validated ? !title : title.length > 50}
                         />
-                        <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">{title.length > 50 ? "Title must be within 50 characters." : "Title is required."}</Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="uploadFile">
@@ -124,7 +125,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                     type="submit"
                     form="uploadForm"
                     style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                    disabled={loading}
+                    disabled={loading || title.length > 50}
                 >
                     {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : (initialData ? 'Save Changes' : 'Upload')}
                 </Button>

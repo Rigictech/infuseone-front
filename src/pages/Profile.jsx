@@ -235,9 +235,11 @@ const Profile = () => {
                                         placeholder="Enter your name"
                                         onChange={(e) => setName(e.target.value)}
                                         required
+                                        maxLength={100}
+                                        isInvalid={validatedProfile ? !name : name.length > 50}
                                     />
                                     <Form.Control.Feedback type="invalid">
-                                        Name is required.
+                                        {name.length > 50 ? "Name must be within 50 characters." : "Name is required."}
                                     </Form.Control.Feedback>
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId="email">
@@ -258,7 +260,7 @@ const Profile = () => {
                                         type="submit"
                                         size="sm"
                                         style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                                        disabled={loadingProfile}
+                                        disabled={loadingProfile || name.length > 50}
                                     >
                                         {loadingProfile ? <Spinner animation="border" size="sm" /> : 'Update Profile'}
                                     </Button>

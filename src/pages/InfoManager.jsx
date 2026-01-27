@@ -237,12 +237,12 @@ const InfoManager = () => {
     };
 
     return (
-        <Container fluid className="py-4" style={{ height: '85vh' }}>
+        <Container fluid className="py-4">
 
             <Card className="border-0 shadow-sm" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Card.Header className="bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                    <h5 className="mb-0" style={{ display: isAdmin ? 'block' : 'none' }}>Info Manager</h5>
-                    {isAdmin && (
+                {isAdmin && (
+                    <Card.Header className="bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">Info Manager</h5>
                         <Button
                             variant="primary"
                             onClick={handleSave}
@@ -252,8 +252,8 @@ const InfoManager = () => {
                             {saving ? <Spinner animation="border" size="sm" className="me-2" /> : <Save size={18} className="me-2" />}
                             Save Changes
                         </Button>
-                    )}
-                </Card.Header>
+                    </Card.Header>
+                )}
                 <Card.Body className="p-0 d-flex flex-column" style={{ flexGrow: 1, overflow: 'hidden' }}>
                     {loading ? (
                         <div className="d-flex justify-content-center align-items-center h-100">

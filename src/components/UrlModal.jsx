@@ -60,9 +60,10 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
                             placeholder="Enter title"
                             value={formData.title}
                             onChange={handleChange}
-                            maxLength={50}
+                            maxLength={100}
+                            isInvalid={validated ? !formData.title : formData.title.length > 50}
                         />
-                        <Form.Control.Feedback type="invalid">Title is required.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">{formData.title.length > 50 ? "Title must be within 50 characters." : "Title is required."}</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="URL">
                         <Form.Label className="fw-medium">URL</Form.Label>
@@ -85,7 +86,7 @@ const UrlModal = ({ show, onHide, onSubmit, initialData, title }) => {
                     type="submit"
                     form="urlForm"
                     style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                    disabled={loading}
+                    disabled={loading || formData.title.length > 50}
                 >
                     {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Save'}
                 </Button>

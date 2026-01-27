@@ -144,7 +144,7 @@ const UploadsList = () => {
                                 style={{ backgroundColor: '#003366', borderColor: '#003366' }}
                                 onClick={handleAdd}
                             >
-                                <Plus size={18} className="me-2" />Add Upload
+                                <Plus size={18} className="me-2" />Add File
                             </Button>
                         )}
                     </div>

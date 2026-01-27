@@ -86,10 +86,11 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     autoComplete="off"
-                                    maxLength={50}
+                                    isInvalid={validated ? !formData.name : formData.name.length > 50}
+                                    maxLength={100}
                                 />
                                 <Form.Control.Feedback type="invalid">
-                                    Name is required.
+                                    {formData.name.length > 50 ? "Name must be within 50 characters." : "Name is required."}
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
@@ -123,7 +124,7 @@ const UserModal = ({ show, onHide, onSubmit, user, title }) => {
                     type="submit"
                     form="userForm"
                     style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                    disabled={loading}
+                    disabled={loading || formData.name.length > 50}
                 >
                     {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : (user ? 'Save Changes' : 'Create User')}
                 </Button>

@@ -147,7 +147,7 @@ const FormstackList = () => {
                                 style={{ backgroundColor: '#003366', borderColor: '#003366' }}
                                 onClick={handleAdd}
                             >
-                                <Plus size={18} className="me-2" />Add Form
+                                <Plus size={18} className="me-2" />Add Formstack
                             </Button>
                         )}
                     </div>
