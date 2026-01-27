@@ -237,7 +237,7 @@ const InfoManager = () => {
     };
 
     return (
-        <Container fluid className="py-4">
+        <Container fluid className="py-4" style={{ height: '85vh' }}>
 
             <Card className="border-0 shadow-sm" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 {isAdmin && (
