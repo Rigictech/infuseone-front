@@ -129,7 +129,7 @@ const InfoManager = () => {
 
     // Role check
     const role = localStorage.getItem('role');
-    const isAdmin = role === 'Admin';
+    const isAdmin = role == 'Admin';
 
     const extensions = useMemo(() => [
         StarterKit,
@@ -241,7 +241,7 @@ const InfoManager = () => {
 
             <Card className="border-0 shadow-sm" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <Card.Header className="bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                    <h5 className="mb-0">Info Manager</h5>
+                    <h5 className="mb-0" style={{ display: isAdmin ? 'block' : 'none' }}>Info Manager</h5>
                     {isAdmin && (
                         <Button
                             variant="primary"

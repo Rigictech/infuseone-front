@@ -15,17 +15,18 @@ const Login = () => {
     const navigate = useNavigate();
     const { setUserProfile, refreshUser } = useUser();
 
-    const validate = () => {
+    const validate = (emailToValidate) => {
         const newErrors = {};
-        if (!email) newErrors.email = 'Email is required';
-        else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email is invalid';
+        if (!emailToValidate) newErrors.email = 'Email is required';
+        else if (!/\S+@\S+\.\S+/.test(emailToValidate)) newErrors.email = 'Email is invalid';
         if (!password) newErrors.password = 'Password is required';
         return newErrors;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const validationErrors = validate();
+        const trimmedEmail = email.trim();
+        const validationErrors = validate(trimmedEmail);
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
         } else {
@@ -33,7 +34,7 @@ const Login = () => {
                 setLoading(true);
                 setApiError('');
 
-                const response = await userService.login({ email, password, "device_name": "web" });
+                const response = await userService.login({ email: trimmedEmail, password, "device_name": "web" });
 
                 // Assuming response.data.token or similar structure
                 const { token, type, user } = response.data; // Adjust based on actual API response

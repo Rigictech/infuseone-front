@@ -14,7 +14,7 @@ const UploadsList = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const role = localStorage.getItem('role');
-    const isAdmin = role === 'Admin';
+    const isAdmin = role == 'Admin';
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);

@@ -15,7 +15,7 @@ const FormstackList = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const role = localStorage.getItem('role');
-    const isAdmin = role === 'Admin';
+    const isAdmin = role == 'Admin';
     const navigate = useNavigate();
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);

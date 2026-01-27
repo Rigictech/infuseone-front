@@ -59,7 +59,7 @@ const Sidebar = ({ isOpen, onClose, isCollapsed }) => {
 
                 <Nav className="sidebar-nav flex-column">
                     {navItems.map((item) => {
-                        const isActive = location.pathname === item.path;
+                        const isActive = location.pathname == item.path;
                         return (
                             <Nav.Link
                                 key={item.path}
