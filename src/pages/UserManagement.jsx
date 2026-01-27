@@ -96,7 +96,13 @@ const UserManagement = () => {
         try {
             await userService.destroy(userToDelete.id);
             toast.success('User deleted successfully');
-            fetchUsers();
+
+            if (users.length === 1 && currentPage > 1) {
+                setCurrentPage(currentPage - 1);
+            } else {
+                fetchUsers();
+            }
+
             setShowDeleteModal(false);
             setUserToDelete(null);
         } catch (err) {
@@ -150,10 +156,10 @@ const UserManagement = () => {
     }, [searchTerm]);
 
     return (
-        <Container fluid className="py-4">
+        <Container fluid className="py-4 d-flex flex-column" style={{ minHeight: 'calc(100vh - 80px)' }}>
             {error && <Alert variant="danger">{error}</Alert>}
 
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm flex-grow-1 d-flex flex-column">
                 <Card.Header className="bg-white border-bottom-0 py-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <InputGroup style={{ maxWidth: '300px' }}>
@@ -178,9 +184,9 @@ const UserManagement = () => {
                         )}
                     </div>
                 </Card.Header>
-                <Card.Body className="p-0">
+                <Card.Body className="p-0 flex-grow-1">
                     <Table hover responsive className="mb-0 align-middle">
-                        <thead className="bg-light">
+                        <thead className="bg-light sticky-top" style={{ zIndex: 1, top: 0 }}>
                             <tr>
                                 <th className="ps-4 text-muted fw-medium py-3" style={{ width: '60px' }}>Profile</th>
                                 <th className="text-muted fw-medium py-3" style={{ width: '30%' }}>Name</th>
@@ -238,7 +244,7 @@ const UserManagement = () => {
                         </tbody>
                     </Table>
                 </Card.Body>
-                <Card.Footer className="bg-white border-top-0">
+                <Card.Footer className="bg-white border-top-0 mt-auto">
                     {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}

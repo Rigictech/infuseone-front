@@ -88,7 +88,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                         <Form.Control
                             required
                             type="text"
-                            placeholder="e.g., Annual Report"
+                            placeholder="Enter Title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             maxLength={100}
@@ -98,12 +98,7 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="uploadFile">
-                        <Form.Label className="fw-medium">Upload File (PDF)</Form.Label>
-                        {initialData && initialData.pdf && !file && (
-                            <div className="mb-2 text-muted small">
-                                Current file: <strong>{initialData.pdf.split('/').pop()}</strong>
-                            </div>
-                        )}
+                        <Form.Label className="fw-medium">Upload File (PDF Only, Max size: 5MB)</Form.Label>
                         <Form.Control
                             type="file"
                             accept=".pdf"
@@ -111,9 +106,6 @@ const UploadModal = ({ show, onHide, onSubmit, initialData }) => {
                             required={!initialData} // Required only for new uploads
                             ref={fileInputRef}
                         />
-                        <Form.Text className="text-muted">
-                            Max size: 5MB. Only .pdf files allowed.
-                        </Form.Text>
                         <Form.Control.Feedback type="invalid">File is required.</Form.Control.Feedback>
                     </Form.Group>
                 </Form>

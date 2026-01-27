@@ -86,7 +86,13 @@ const WebsiteList = () => {
         try {
             await webURLService.delete(urlToDelete.id);
             toast.success('Website URL deleted successfully');
-            fetchUrls();
+
+            if (urls.length === 1 && currentPage > 1) {
+                setCurrentPage(currentPage - 1);
+            } else {
+                fetchUrls();
+            }
+
             setShowDeleteModal(false);
             setUrlToDelete(null);
         } catch (err) {
@@ -124,10 +130,10 @@ const WebsiteList = () => {
     }, [searchTerm]);
 
     return (
-        <Container fluid className="py-4">
+        <Container fluid className="py-4 d-flex flex-column" style={{ minHeight: 'calc(100vh - 80px)' }}>
             {error && <Alert variant="danger">{error}</Alert>}
 
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm flex-grow-1 d-flex flex-column">
                 <Card.Header className="bg-white border-bottom-0 py-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <InputGroup style={{ maxWidth: '300px' }}>
@@ -152,9 +158,9 @@ const WebsiteList = () => {
                         )}
                     </div>
                 </Card.Header>
-                <Card.Body className="p-0">
+                <Card.Body className="p-0 flex-grow-1">
                     <Table hover responsive className="mb-0 align-middle">
-                        <thead className="bg-light">
+                        <thead className="bg-light sticky-top" style={{ zIndex: 1, top: 0 }}>
                             <tr>
                                 <th className="ps-4 py-3 text-muted fw-medium">Title</th>
                                 <th className="py-3 text-muted fw-medium">URL</th>
@@ -167,8 +173,8 @@ const WebsiteList = () => {
                             ) : filteredUrls.length > 0 ? (
                                 filteredUrls.map(url => (
                                     <tr key={url.id}>
-                                        <td className="ps-4 fw-medium">{url.title || url.name}</td>
-                                        <td><a href={url.url || url.URL} target="_blank" rel="noopener noreferrer" className="text-decoration-none">{url.url || url.URL}</a></td>
+                                        <td className="ps-4 text-muted text-muted">{url.title || url.name}</td>
+                                        <td><a href={url.url || url.URL} target="_blank" rel="noopener noreferrer" className="text-decoration-none text-muted">{url.url || url.URL}</a></td>
                                         {isAdmin && (
                                             <td className="pe-4 text-center">
                                                 <Button variant="link" className="p-1 text-success me-2" onClick={() => handleEdit(url)}><PenLine size={18} /></Button>
@@ -183,7 +189,7 @@ const WebsiteList = () => {
                         </tbody>
                     </Table>
                 </Card.Body>
-                <Card.Footer className="bg-white border-top-0">
+                <Card.Footer className="bg-white border-top-0 mt-auto">
                     {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}

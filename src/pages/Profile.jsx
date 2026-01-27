@@ -225,7 +225,7 @@ const Profile = () => {
                     {/* Email Update Form */}
                     <Card className="border-0 shadow-sm mb-4">
                         <Card.Body>
-                            <h6 className="fw-bold mb-3 text-primary">Update Profile</h6>
+                            <h6 className="fw-bold mb-3" style={{ color: "#003366" }}>Update Profile</h6>
                             <Form noValidate validated={validatedProfile} onSubmit={handleEmailUpdate}>
                                 <Form.Group className="mb-3" controlId="name">
                                     <Form.Label className="fw-medium small">Name</Form.Label>
@@ -272,7 +272,7 @@ const Profile = () => {
                     {/* Password Update Form */}
                     <Card className="border-0 shadow-sm">
                         <Card.Body>
-                            <h6 className="fw-bold mb-3 text-primary">Change Password</h6>
+                            <h6 className="fw-bold mb-3" style={{ color: "#003366" }}>Change Password</h6>
                             <Form noValidate validated={validatedPassword} onSubmit={handlePasswordUpdate}>
                                 <Form.Group className="mb-3" controlId="currentPassword">
                                     <Form.Label className="fw-medium small">Current Password</Form.Label>

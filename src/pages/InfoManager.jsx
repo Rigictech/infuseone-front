@@ -240,20 +240,7 @@ const InfoManager = () => {
         <Container fluid className="py-4" style={{ height: '85vh' }}>
 
             <Card className="border-0 shadow-sm" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                {isAdmin && (
-                    <Card.Header className="bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                        <h5 className="mb-0">Info Manager</h5>
-                        <Button
-                            variant="primary"
-                            onClick={handleSave}
-                            disabled={saving || loading}
-                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
-                        >
-                            {saving ? <Spinner animation="border" size="sm" className="me-2" /> : <Save size={18} className="me-2" />}
-                            Save Changes
-                        </Button>
-                    </Card.Header>
-                )}
+
                 <Card.Body className="p-0 d-flex flex-column" style={{ flexGrow: 1, overflow: 'hidden' }}>
                     {loading ? (
                         <div className="d-flex justify-content-center align-items-center h-100">
@@ -266,6 +253,19 @@ const InfoManager = () => {
                         </div>
                     )}
                 </Card.Body>
+                {isAdmin && (
+                    <Card.Footer className="bg-white border-top py-3 d-flex justify-content-center align-items-center">
+                        <Button
+                            variant="primary"
+                            onClick={handleSave}
+                            disabled={saving || loading}
+                            style={{ backgroundColor: '#003366', borderColor: '#003366' }}
+                        >
+                            {saving ? <Spinner animation="border" size="sm" className="me-2" /> : <Save size={18} className="me-2" />}
+                            Save Changes
+                        </Button>
+                    </Card.Footer>
+                )}
             </Card>
         </Container>
     );

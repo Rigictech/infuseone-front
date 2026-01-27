@@ -75,6 +75,24 @@ const UploadsList = () => {
         setShowModal(true);
     };
 
+    const handleDownload = async (id, fileName) => {
+
+        try {
+            const response = await uploadService.downloadFile(id);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName ? `${fileName}.pdf` : 'download.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            toast.error('Failed to download file');
+        }
+    };
+
+
     const handleDeleteClick = (upload) => {
         setUploadToDelete(upload);
         setShowDeleteModal(true);
@@ -86,12 +104,18 @@ const UploadsList = () => {
         setDeleteLoading(true);
         try {
             await uploadService.delete(uploadToDelete.id);
-            toast.success('Upload deleted successfully');
-            fetchUploads(currentPage);
+            toast.success('File deleted successfully');
+
+            if (uploads.length === 1 && currentPage > 1) {
+                setCurrentPage(currentPage - 1);
+            } else {
+                fetchUploads(currentPage);
+            }
+
             setShowDeleteModal(false);
             setUploadToDelete(null);
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to delete upload');
+            toast.error(err.response?.data?.message || 'Failed to delete file');
         } finally {
             setDeleteLoading(false);
         }
@@ -121,10 +145,10 @@ const UploadsList = () => {
     // Initial load handled by first use effect
 
     return (
-        <Container fluid className="py-4">
+        <Container fluid className="py-4 d-flex flex-column" style={{ minHeight: 'calc(100vh - 80px)' }}>
             {error && <Alert variant="danger">{error}</Alert>}
 
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm flex-grow-1 d-flex flex-column">
                 <Card.Header className="bg-white border-bottom-0 py-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <InputGroup style={{ maxWidth: '300px' }}>
@@ -149,13 +173,13 @@ const UploadsList = () => {
                         )}
                     </div>
                 </Card.Header>
-                <Card.Body className="p-0">
+                <Card.Body className="p-0 flex-grow-1">
                     <Table hover responsive className="mb-0 align-middle">
-                        <thead className="bg-light">
+                        <thead className="bg-light sticky-top" style={{ zIndex: 1, top: 0 }}>
                             <tr>
-                                <th className="ps-4 py-3 text-muted fw-medium">Name</th>
-                                <th className="py-3 text-muted fw-medium">Created Date</th>
-                                <th className="pe-4 py-3 text-center text-muted fw-medium" style={{ width: '150px' }}>Actions</th>
+                                <th className="ps-4 py-3 text-muted fw-medium py-3">Name</th>
+                                <th className="py-3 text-muted fw-medium py-3">Created Date</th>
+                                <th className="pe-4 py-3 text-center text-muted fw-medium py-3" style={{ width: '150px' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -163,15 +187,11 @@ const UploadsList = () => {
                                 <tr><td colSpan="3" className="text-center py-5"><Spinner animation="border" variant="primary" /></td></tr>
                             ) : filteredUploads.length > 0 ? (
                                 filteredUploads.map(upload => {
-                                    const baseUrl = import.meta.env.VITE_LARAVEL_IMAGE_URL || '';
-                                    const rawPath = upload.pdf || '';
-                                    // Ensure the path targets the 'pdfs' directory in storage
-                                    const pdfPath = rawPath.startsWith('pdfs/') ? rawPath : `pdfs/${rawPath}`;
-                                    const fullUrl = `${baseUrl}${pdfPath}`;
+
 
                                     return (
                                         <tr key={upload.id}>
-                                            <td className="ps-4 fw-medium">
+                                            <td className="ps-4 text-muted">
                                                 <div className="d-flex align-items-center gap-2">
                                                     <div className="bg-light p-2 rounded text-danger"><FileText size={18} /></div>
                                                     {upload.name || upload.title}
@@ -185,12 +205,8 @@ const UploadsList = () => {
                                                     <Button
                                                         variant="link"
                                                         className="p-1 text-primary"
-                                                        href={fullUrl}
-                                                        download
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
+                                                        onClick={() => handleDownload(upload.id, upload.name || upload.title)}
                                                         title="Download"
-                                                        disabled={!pdfPath}
                                                     >
                                                         <Download size={18} />
                                                     </Button>
@@ -211,7 +227,7 @@ const UploadsList = () => {
                         </tbody>
                     </Table>
                 </Card.Body>
-                <Card.Footer className="bg-white border-top-0">
+                <Card.Footer className="bg-white border-top-0 mt-auto">
                     {!loading && totalRecords > 0 && (
                         <Pagination
                             currentPage={currentPage}

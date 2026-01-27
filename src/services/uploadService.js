@@ -43,6 +43,7 @@ const uploadService = {
     store: (userData) => apiClient.post(`admin/upload-pdf/create`, userData),
     update: (id, userData) => apiClient.post(`admin/upload-pdf/update/${id}`, userData),
     delete: (id) => apiClient.post(`admin/upload-pdf/destroy/${id}`),
+    downloadFile: (id) => apiClient.post(`admin/upload-pdf/download-pdf/${id}`, {}, { responseType: 'blob' }),
 };
 
 export default uploadService;
