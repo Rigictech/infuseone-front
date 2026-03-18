@@ -102,6 +102,7 @@ const Profile = () => {
             await refreshUser();
 
             toast.success('Profile updated successfully!');
+            setValidatedProfile(false);
 
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to update profile.');
@@ -128,13 +129,19 @@ const Profile = () => {
         setLoadingPassword(true);
 
         try {
-            await userService.changePassword({
+
+            const response = await userService.changePassword({
                 current_password: passwords.currentPassword,
                 new_password: passwords.newPassword,
                 new_password_confirmation: passwords.newPassword // Often required
             });
-            toast.success('Password updated successfully!');
-            setPasswords({ currentPassword: '', newPassword: '' });
+            if (response?.data?.status == true) {
+                toast.success(response?.data?.message);
+                setPasswords({ currentPassword: '', newPassword: '' });
+                setValidatedPassword(false);
+            } else {
+                toast.error(response?.data?.message);
+            }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to update password.');
         } finally {

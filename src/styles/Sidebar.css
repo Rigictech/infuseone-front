@@ -212,6 +212,7 @@
   }
 
   .sidebar.open {
+    margin-top: 60px;
     transform: translateX(0);
   }
 
