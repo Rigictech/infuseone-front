@@ -32,7 +32,7 @@ function App() {
     <UserProvider>
       <Toaster position="top-right" />
       <BrowserRouter
-        basename={import.meta.env.PROD ? "/infuseone-ghost-page" : "/"}
+        basename={import.meta.env.PROD ? "/" : "/"}
       >
         <Routes>
           {/* Public */}
